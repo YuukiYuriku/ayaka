@@ -1,0 +1,11 @@
+logs
+node_modules
+.idea
+.DS_Store
+.env
+mocks
+bin
+*.out
+./main
+ayaka.exe
+main

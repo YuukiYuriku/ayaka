@@ -1,0 +1,52 @@
+app: "ayaka"
+appVer: "v0.0.1"
+env: ${ENVIRONMENT:development}
+
+http:
+  port: ${HTTP_PORT:8000}
+  writeTimeout: 30
+  readTimeout: 30
+
+log:
+  fileLocation: "logs"
+  fileTDRLocation: "logs"
+  fileMaxSize: ${LOG_FILEMAXSIZE:1} # megabytes
+  fileMaxBackup: ${LOG_FILEMAXBACKUP:30}
+  fileMaxAge: ${LOG_FILEMAXAGE:10} # days
+  stdout: ${LOG_STDOUT:true}
+
+database:
+  host: ${DATABASE_HOST:127.0.0.1}
+  port: ${DATABASE_PORT:3306}
+  dbName: ${DATABASE_DBNAME:pakuningratan}
+  user: ${DATABASE_USERNAME}
+  password: ${DATABASE_PASSWORD}
+
+redis:
+  mode: ${REDIS_MODE:single} # single/sentinel/cluster
+  address: ${REDIS_ADDRESS:127.0.0.1}
+  port: ${REDIS_PORT:6379}
+  password: ${REDIS_PASSWORD:""}
+
+toggle:
+  appName: ayaka
+  url: ${TOGGLE_URL:https://ayaka.runsystemdev.com/api/}
+  token: ${TOGGLE_TOKEN}
+
+jwt:
+  jwtKey: ${JWT_KEY}
+  jwtDuration: ${JWT_DURATION_TIME}
+  changePassKey: ${CHANGE_PASS_KEY}
+  changePassDuration: ${CHANGE_PASS_DURATION_TIME}
+
+email:
+  smtpHost: ${SMTP_HOST}
+  smtpPort: ${SMTP_PORT}
+  user: ${MAILGUN_USER}
+  pass: ${MAILGUN_PASSWORD}
+  emailFrom: ${EMAIL_FROM}
+  sendDuration: ${SEND_EMAIL_DURATION}
+
+domain:
+  frontendDomain: ${FRONTEND_DOMAIN}
+  forgotPass: ${FORGOT_PASS}

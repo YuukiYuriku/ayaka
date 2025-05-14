@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  pakuningratan:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "10"
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: unless-stopped
+      update_config:
+        parallelism: 1
+        delay: 10s
+    volumes:
+      - ./log:/app/logs
