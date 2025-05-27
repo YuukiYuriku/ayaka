@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/gofiber/fiber/v2"
@@ -29,6 +30,7 @@ func (h *HealthCheckHandler) Ready(c *fiber.Ctx) error {
 	sqlDB := h.Database.DB
 	err := sqlDB.Ping()
 	if err != nil {
+		fmt.Print("nih error", err)
 		message["database"] = "not ready"
 	} else {
 		message["database"] = "ready"
