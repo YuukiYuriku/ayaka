@@ -11,12 +11,12 @@ type ReadTblProvince struct {
 }
 
 type DetailTblProvince struct {
-	ProvCode    string                     `db:"ProvCode" json:"province_code"`
-	ProvName    string                     `db:"ProvName" json:"province_name"`
-	CntCode     string                     `db:"CntCode" json:"country_code"`
-	CntName     string                     `db:"CntName" json:"country"`
-	CreateBy    string                     `db:"CreateBy" json:"create_by"`
-	CreateDate  string                     `db:"CreateDt" json:"create_date"`
+	ProvCode   string `db:"ProvCode" json:"province_code"`
+	ProvName   string `db:"ProvName" json:"province_name"`
+	CntCode    string `db:"CntCode" json:"country_code"`
+	CntName    string `db:"CntName" json:"country"`
+	CreateBy   string `db:"CreateBy" json:"create_by"`
+	CreateDate string `db:"CreateDt" json:"create_date"`
 }
 
 type CreateTblProvince struct {
