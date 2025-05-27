@@ -38,6 +38,8 @@ func (t *TblUser) Login(ctx context.Context, data *tbluser.Logintbluser) (string
 		golog.Error(ctx, "Error login: "+err.Error(), err)
 		return "", 0, err
 	}
+	fmt.Println("pw: ", user.Password)
+	fmt.Println("pw: ", data.Password)
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(data.Password))
 	if err != nil {
