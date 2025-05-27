@@ -20,7 +20,7 @@ database:
   port: ${DATABASE_PORT:3306}
   dbName: ${DATABASE_DBNAME:pakuningratan}
   user: ${DATABASE_USERNAME}
-  password: ${DATABASE_PASSWORD}
+  password: ${DATABASE_PASSWORD:""}
 
 redis:
   mode: ${REDIS_MODE:single} # single/sentinel/cluster
