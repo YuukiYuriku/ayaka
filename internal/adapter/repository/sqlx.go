@@ -14,19 +14,30 @@ type Sqlx struct {
 }
 
 func (s *Sqlx) Startup() error {
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s",
+	// dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s",
+	// 	s.Conf.Database.User,
+	// 	s.Conf.Database.Password,
+	// 	s.Conf.Database.Host,
+	// 	s.Conf.Database.Port,
+	// 	s.Conf.Database.DBName,
+	// )
+
+	// Develop local
+	dsn := fmt.Sprintf("%s:@tcp(%s:%s)/%s",
 		s.Conf.Database.User,
-		s.Conf.Database.Password,
 		s.Conf.Database.Host,
 		s.Conf.Database.Port,
 		s.Conf.Database.DBName,
 	)
+
+	fmt.Print("data: ", dsn)
 
 	db, err := sqlx.Open("mysql", dsn)
 	if err != nil {
 		return err
 	}
 
+	fmt.Print("nih error 2", err)
 	s.DB = db
 
 	return nil
