@@ -25,6 +25,14 @@ func RegisterService() {
 	appContainer.RegisterService("tblStockMutationService", new(service.TblStockMutation))
 	appContainer.RegisterService("tblStockMovementService", new(service.TblStockMovement))
 	appContainer.RegisterService("tblDirectPurchaseReceiveService", new(service.TblDirectPurchaseReceive))
+	appContainer.RegisterService("tblTaxGroupService", new(service.TblTaxGroup))
+	appContainer.RegisterService("tblTaxService", new(service.TblTax))
+	appContainer.RegisterService("tblCustomerCategoryService", new(service.TblCustomerCategory))
+	appContainer.RegisterService("tblSiteService", new(service.TblSite))
+	appContainer.RegisterService("tblVendorCategoryService", new(service.TblVendorCategory))
+	appContainer.RegisterService("tblVendorRatingService", new(service.TblVendorRating))
+	appContainer.RegisterService("tblVendorSectorService", new(service.TblVendorSector))
+	appContainer.RegisterService("tblVendorService", new(service.TblVendor))
 }
 
 func RegisterApi() {
@@ -49,6 +57,14 @@ func RegisterApi() {
 	appContainer.RegisterService("tblStockMutationHandler", new(api.TblStockMutationHandler))
 	appContainer.RegisterService("tblStockMovementHandler", new(api.TblStockMovementHandler))
 	appContainer.RegisterService("tblDirectPurchaseReceiveHandler", new(api.TblDirectPurchaseReceiveHandler))
+	appContainer.RegisterService("tblTaxGroupHandler", new(api.TblTaxGroupHandler))
+	appContainer.RegisterService("tblTaxHandler", new(api.TblTaxHandler))
+	appContainer.RegisterService("tblCustomerCategoryHandler", new(api.TblCustomerCategoryHandler))
+	appContainer.RegisterService("tblSiteHandler", new(api.TblSiteHandler))
+	appContainer.RegisterService("tblVendorCategoryHandler", new(api.TblVendorCategoryHandler))
+	appContainer.RegisterService("tblVendorRatingHandler", new(api.TblVendorRatingHandler))
+	appContainer.RegisterService("tblVendorSectorHandler", new(api.TblVendorSectorHandler))
+	appContainer.RegisterService("tblVendorHandler", new(api.TblVendorHandler))
 
 	appContainer.RegisterService("api", new(application.Api))
 
