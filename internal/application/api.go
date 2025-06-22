@@ -30,6 +30,14 @@ type Api struct {
 	TblStockMutationHandler     api.TblStockMutationApi             `inject:"tblStockMutationHandler"`
 	TblStockMovement            api.TblStockMovementApi             `inject:"tblStockMovementHandler"`
 	TblDirectPurchaseReceive    api.TblDirectPurchaseReceiveApi     `inject:"tblDirectPurchaseReceiveHandler"`
+	TblTaxGroupHandler          api.TblTaxGroupApi                  `inject:"tblTaxGroupHandler"`
+	TblTaxHandler               api.TblTaxApi                       `inject:"tblTaxHandler"`
+	TblCustomerCategoryHandler  api.TblCustomerCategoryApi          `inject:"tblCustomerCategoryHandler"`
+	TblSiteHandler              api.TblSiteApi                      `inject:"tblSiteHandler"`
+	TblVendorCategoryHandler    api.TblVendorCategoryApi            `inject:"tblVendorCategoryHandler"`
+	TblVendorRatingHandler      api.TblVendorRatingApi              `inject:"tblVendorRatingHandler"`
+	TblVendorSectorHandler      api.TblVendorSectorApi              `inject:"tblVendorSectorHandler"`
+	TblVendorHandler            api.TblVendorApi                    `inject:"tblVendorHandler"`
 }
 
 func (a *Api) Startup() error {
@@ -153,6 +161,59 @@ func (a *Api) Startup() error {
 	directPurchaseReceive.Get("/:code", a.TblDirectPurchaseReceive.Detail)
 	directPurchaseReceive.Post("/", a.TblDirectPurchaseReceive.Create)
 	directPurchaseReceive.Put("/:code", a.TblDirectPurchaseReceive.Update)
+
+	// tax group
+	taxGroup := v1.Group("/tax-group")
+	taxGroup.Get("/", a.TblTaxGroupHandler.Fetch)
+	taxGroup.Post("/", a.TblTaxGroupHandler.Create)
+	taxGroup.Put("/:code", a.TblTaxGroupHandler.Update)
+
+	// tax
+	tax := v1.Group("/tax")
+	tax.Get("/", a.TblTaxHandler.Fetch)
+	tax.Post("/", a.TblTaxHandler.Create)
+	tax.Put("/:code", a.TblTaxHandler.Update)
+
+	// customer category
+	customerCategory := v1.Group("/customer-category")
+	customerCategory.Get("/", a.TblCustomerCategoryHandler.Fetch)
+	customerCategory.Post("/", a.TblCustomerCategoryHandler.Create)
+	customerCategory.Put("/:code", a.TblCustomerCategoryHandler.Update)
+
+	// site
+	site := v1.Group("/site")
+	site.Get("/", a.TblSiteHandler.Fetch)
+	site.Post("/", a.TblSiteHandler.Create)
+	site.Put("/:code", a.TblSiteHandler.Update)
+
+	// vendor category
+	vendorCat := v1.Group("/vendor-category")
+	vendorCat.Get("/", a.TblVendorCategoryHandler.Fetch)
+	vendorCat.Post("/", a.TblVendorCategoryHandler.Create)
+	vendorCat.Put("/:code", a.TblVendorCategoryHandler.Update)
+
+	// vendor rating
+	vendorRating := v1.Group("/vendor-rating")
+	vendorRating.Get("/", a.TblVendorRatingHandler.Fetch)
+	vendorRating.Post("/", a.TblVendorRatingHandler.Create)
+	vendorRating.Put("/:code", a.TblVendorRatingHandler.Update)
+
+	// vendor sector
+	vendorSector := v1.Group("/vendor-sector")
+	vendorSector.Get("/", a.TblVendorSectorHandler.Fetch)
+	vendorSector.Post("/", a.TblVendorSectorHandler.Create)
+	vendorSector.Put("/:code", a.TblVendorSectorHandler.Update)
+
+	getSector := vendorSector.Group("/get-sector")
+	getSector.Get("/", a.TblVendorSectorHandler.GetSector)
+	getSector.Get("/:code", a.TblVendorSectorHandler.GetSubSector)
+
+	// master vendor
+	vendor := v1.Group("/master-vendor")
+	vendor.Get("/", a.TblVendorHandler.Fetch)
+	vendor.Get("/:code", a.TblVendorHandler.Detail)
+	vendor.Post("/", a.TblVendorHandler.Create)
+	vendor.Put("/:code", a.TblVendorHandler.Update)
 
 	return nil
 }
