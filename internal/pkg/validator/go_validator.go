@@ -104,6 +104,7 @@ func (v *GoValidator) registerCustomValidators() {
 	v.validate.RegisterValidation("unique", v.uniqueValidator)
 	v.validate.RegisterValidation("complexpassword", v.complexPasswordValidator)
 	v.validate.RegisterValidation("incolumn", v.incolumnValidator)
+	v.validate.RegisterValidation("whitespace", v.whiteSpaceValidator)
 
 	// unique validate
 	v.validate.RegisterTranslation("unique", v.uni, func(ut ut.Translator) error {
@@ -124,6 +125,13 @@ func (v *GoValidator) registerCustomValidators() {
 		return ut.Add("complexpassword", "{0} not valid", true)
 	}, func(ut ut.Translator, fe validator.FieldError) string {
 		return "Password must be 8-12 characters long, contain: uppercase, lowercase, special character and number"
+	})
+
+	//whitespace validate
+	v.validate.RegisterTranslation("whitespace", v.uni, func(ut ut.Translator) error {
+		return ut.Add("whitespace", "{0} not valid", true)
+	}, func(ut ut.Translator, fe validator.FieldError) string {
+		return "This field doesn't accept space"
 	})
 }
 
@@ -206,6 +214,14 @@ func (v *GoValidator) complexPasswordValidator(fl validator.FieldLevel) bool {
 
 	// Check that all conditions are met
 	return hasLower && hasUpper && hasNumber && hasSpecial
+}
+
+func (v *GoValidator) whiteSpaceValidator(fl validator.FieldLevel) bool {
+	text := fl.Field().String()
+
+	fmt.Println("space status: ", strings.IndexFunc(text, unicode.IsSpace) == -1)
+
+	return strings.IndexFunc(text, unicode.IsSpace) == -1
 }
 
 func (v *GoValidator) Validate(ctx context.Context, data interface{}) error {
