@@ -25,6 +25,14 @@ var listTable = map[string]string{
 	"StockMutationDtl":         "tblstockmutationdtl",
 	"DirectPurchaseReceive":    "tblrecvvdhdr",
 	"DirectPurchaseReceiveDtl": "tblrecvvddtl",
+	"TaxGroup":                 "tbltaxgroup",
+	"Tax":                      "tbltax",
+	"CustomerCategory":         "tblcustomercategory",
+	"Site":                     "tblsite",
+	"VendorCategory":           "tblvendorcategory",
+	"VendorRating":             "tblvendorrating",
+	"VendorSector":             "tblvendorsectorhdr",
+	"Vendor":                   "tblvendorhdr",
 }
 
 var listCode = map[string]string{
@@ -45,6 +53,14 @@ var listCode = map[string]string{
 	"StockMutationDtl":         "DNo",
 	"DirectPurchaseReceive":    "DocNo",
 	"DirectPurchaseReceiveDtl": "DNo",
+	"TaxGroup":                 "TaxGroupCode",
+	"Tax":                      "TaxCode",
+	"CustomerCategory":         "CustCatCode",
+	"Site":                     "SiteCode",
+	"VendorCategory":           "VendorCatCode",
+	"VendorRating":             "IndicatorCode",
+	"VendorSector":             "SectorCode",
+	"Vendor":                   "VendorCode",
 }
 
 var listDoc = map[string]string{
