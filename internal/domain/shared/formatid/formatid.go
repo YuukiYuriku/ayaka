@@ -98,3 +98,19 @@ func (s *GenerateIDHandler) GetLastDetailNumber(ctx context.Context, category st
 
 	return total, nil
 }
+
+// Generate Code
+func (s *GenerateIDHandler) GenerateIDCode(ctx context.Context, tblName string) (string, error) {
+	query := fmt.Sprintf("SELECT COUNT(*) FROM %s;", tblName)
+	var count int
+	err := s.DB.GetContext(ctx, &count, query)
+	if err != nil {
+		return "", fmt.Errorf("failed to get count: %w", err)
+	}
+
+	if count == 0 {
+		return "00001", nil
+	}
+
+	return fmt.Sprintf("%05d", count+1), nil
+}
