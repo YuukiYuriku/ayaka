@@ -23,6 +23,7 @@ func (t *TblUserRepository) Login(ctx context.Context, accessToken string) (stri
 	idToken := identity.NewID().String()
 
 	if err := t.Cache.Put(ctx, idToken, accessToken, time.Duration(t.Config.JWT.JWTDuration)*time.Hour); err != nil {
+		fmt.Println("error cache: ", err)
 		return "", customerrors.ErrFailedSaveToken
 	}
 	return idToken, nil
