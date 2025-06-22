@@ -63,6 +63,8 @@ func (h *TblUserHandler) Login(c *fiber.Ctx) error {
 		"duration":     duration,
 	}
 
+	fmt.Println("data: ", data)
+
 	go h.Log.LogUserInfo(user.UserCode, "INFO", "Login")
 
 	return c.Status(fiber.StatusCreated).JSON(formatter.NewSuccessResponse(formatter.Success, data))
