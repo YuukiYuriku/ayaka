@@ -13,6 +13,7 @@ type Read struct {
 	LocalCode     nulldatatype.NullDataType `db:"ItCodeInternal" json:"local_code"`
 	ForeignName   nulldatatype.NullDataType `db:"ForeignName" json:"foreign_name"`
 	OldCode       nulldatatype.NullDataType `db:"ItCodeOld" json:"old_code"`
+	CategoryCode  string                    `db:"ItCtCode" json:"category_code"`
 	Category      string                    `db:"ItCtName" json:"category_name"`
 	Spesification nulldatatype.NullDataType `db:"Specification" json:"spesification"`
 	Active        booldatatype.BoolDataType `db:"ActInd" json:"active"`
@@ -47,7 +48,7 @@ type Create struct {
 	LocalCode     nulldatatype.NullDataType `db:"ItCodeInternal" json:"local_code" validate:"max=30" label:"Local Code"`
 	ForeignName   nulldatatype.NullDataType `db:"ForeignName" json:"foreign_name" validate:"max=250" label:"Foreign Name"`
 	OldCode       nulldatatype.NullDataType `db:"ItCodeOld" json:"old_code" validate:"max=30" label:"Old Code"`
-	Category      string                    `db:"ItCtCode" json:"category_code" validate:"min=1,incolumn=tblitemcategory->ItCtCode" label:"Category"`
+	Category      string                    `db:"ItCtCode" json:"category_code" validate:"required,min=1,incolumn=tblitemcategory->ItCtCode" label:"Category"`
 	Spesification nulldatatype.NullDataType `db:"Specification" json:"spesification" validate:"max=400"  label:"Spesification"`
 	Active        booldatatype.BoolDataType `db:"ActInd" json:"active"`
 	CreateDate    string                    `db:"CreateDt" json:"create_date"`
