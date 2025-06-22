@@ -1,0 +1,15 @@
+package tblvendorsector
+
+import (
+	"context"
+
+	"gitlab.com/ayaka/internal/pkg/pagination"
+)
+
+type Repository interface {
+	Fetch(ctx context.Context, name, active string, param *pagination.PaginationParam) (*pagination.PaginationResponse, error)
+	Create(ctx context.Context, data *Create) (*Create, error)
+	Update(ctx context.Context, data *Update) (*Update, error)
+	GetSector(ctx context.Context) ([]GetSector, error)
+	GetSubSector(ctx context.Context, code string) ([]GetSubSector, error)
+}
