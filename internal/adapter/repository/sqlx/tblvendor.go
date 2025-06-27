@@ -805,14 +805,15 @@ func (t *TblVendorRepository) Update(ctx context.Context, data *tblmastervendor.
 
 	if rowsAffectedHdr == 0 && rowsAffectedContact == 0 && rowsAffectedItemCategory == 0 && rowsAffectedSector == 0 && rowsAffectedRating == 0 {
 		fmt.Println("NO DATA UPDATED-------")
-		return data, customerrors.ErrNoDataEdited
+		err = customerrors.ErrNoDataEdited
+		return data, err
 	}
 
 	// Insert to log activity
 	query = "INSERT INTO tbllogactivity (UserCode, Code, Category, LastUpDt) VALUES (?, ?, ?, ?)"
 
 	fmt.Println("--Update Log--")
-	if _, err = tx.ExecContext(ctx, query, data.LastUpdateBy, data.VendorCode, "MasterVendor", data.LastUpdateDate); err != nil {
+	if _, err = tx.ExecContext(ctx, query, data.LastUpdateBy, data.VendorCode, "Vendor", data.LastUpdateDate); err != nil {
 		log.Printf("Detailed error: %+v", err)
 		return nil, fmt.Errorf("error inserting log activity: %w", err)
 	}

@@ -61,3 +61,11 @@ func FormatToCompactDateTime(input string) (string, error) {
 	}
 	return parsedTime.Format("20060102"), nil
 }
+
+func ToDatePicker(input string) (string) {
+	parsedTime, err := time.Parse("20060102", input)
+	if err != nil {
+		return ""
+	}
+	return parsedTime.Format("2006-01-02")
+}

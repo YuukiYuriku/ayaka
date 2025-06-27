@@ -32,7 +32,7 @@ var listTable = map[string]string{
 	"VendorCategory":           "tblvendorcategory",
 	"VendorRating":             "tblvendorrating",
 	"VendorSector":             "tblvendorsectorhdr",
-	"Vendor":                   "tblvendorhdr",
+	"MasterVendor":             "tblvendorhdr",
 }
 
 var listCode = map[string]string{
@@ -60,7 +60,7 @@ var listCode = map[string]string{
 	"VendorCategory":           "VendorCatCode",
 	"VendorRating":             "IndicatorCode",
 	"VendorSector":             "SectorCode",
-	"Vendor":                   "VendorCode",
+	"MasterVendor":             "VendorCode",
 }
 
 var listDoc = map[string]string{

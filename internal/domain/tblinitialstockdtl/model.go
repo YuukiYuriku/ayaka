@@ -16,6 +16,7 @@ type Read struct {
 	Quantity  float32                   `db:"Qty" json:"quantity,omitempty"`
 	Uom       string                    `db:"UomName" json:"uom,omitempty"`
 	Price     float32                   `db:"UPrice" json:"price,omitempty"`
+	Source    string                    `db:"Source" json:"source"`
 }
 
 type Create struct {

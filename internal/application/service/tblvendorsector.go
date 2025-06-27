@@ -36,7 +36,7 @@ func (s *TblVendorSector) Fetch(ctx context.Context, search string, status bool,
 func (s *TblVendorSector) Create(ctx context.Context, data *tblvendorsector.Create, userName string) (*tblvendorsector.Create, error) {
 	data.CreateBy = userName
 	data.CreateDate = time.Now().Format("200601021504")
-	data.Active = booldatatype.FromBool(data.Active.ToBool())
+	data.Active = booldatatype.FromBool(true)
 
 	res, err := s.TemplateRepo.Create(ctx, data)
 	if err != nil {
@@ -50,7 +50,7 @@ func (s *TblVendorSector) Create(ctx context.Context, data *tblvendorsector.Crea
 func (s *TblVendorSector) Update(ctx context.Context, data *tblvendorsector.Update, userCode string) (*tblvendorsector.Update, error) {
 	data.LastUpdateBy = userCode
 	data.LastUpdateDate = time.Now().Format("200601021504")
-	data.Active = booldatatype.FromBool(data.Active.ToBool())
+	data.Active = booldatatype.FromBool(true)
 
 	if len(data.Details) > 0 {
 		for i := range data.Details {

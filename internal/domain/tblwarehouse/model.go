@@ -46,8 +46,8 @@ type DetailTblWarehouse struct {
 }
 
 type CreateTblWarehouse struct {
-	WhsCode       string `db:"WhsCode" json:"warehouse_code" validate:"required,unique=tblwarehouse->WhsCode" label:"Warehouse Code"`
-	WhsName       string `db:"WhsName" json:"warehouse_name" validate:"required,unique=tblwarehouse->WhsName" label:"Warehouse Name"`
+	WhsCode       string `db:"WhsCode" json:"warehouse_code" validate:"required,unique=tblwarehouse->WhsCode,max=16" label:"Warehouse Code"`
+	WhsName       string `db:"WhsName" json:"warehouse_name" validate:"required,unique=tblwarehouse->WhsName,max=80" label:"Warehouse Name"`
 	WhsCtCode     string `db:"WhsCtCode" json:"warehouse_category_code" label:"Warehouse Category Code"`
 	Address       string `db:"Address" json:"address" label:"Address"`
 	CityCode      string `db:"CityCode" json:"city_code" label:"City Code"`

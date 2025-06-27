@@ -57,6 +57,16 @@ func (s *TblVendor) Create(ctx context.Context, data *tblmastervendor.Create, us
 	}
 
 	if len(data.ItemCategoryVendor) != 0 {
+		var temp []tblmastervendor.ItemCategoryVendor
+
+		for i := range data.ItemCategoryVendor {
+			if data.ItemCategoryVendor[i].ItemCategoryCode != "" {
+				temp = append(temp, data.ItemCategoryVendor[i])
+			}
+		}
+
+		data.ItemCategoryVendor = temp
+
 		for i := range data.ItemCategoryVendor {
 			data.ItemCategoryVendor[i].Active = booldatatype.FromBool(true)
 		}
@@ -108,6 +118,16 @@ func (s *TblVendor) Update(ctx context.Context, data *tblmastervendor.Update, us
 	}
 
 	if len(data.ItemCategoryVendor) != 0 {
+		var temp []tblmastervendor.ItemCategoryVendor
+
+		for i := range data.ItemCategoryVendor {
+			if data.ItemCategoryVendor[i].ItemCategoryCode != "" {
+				temp = append(temp, data.ItemCategoryVendor[i])
+			}
+		}
+
+		data.ItemCategoryVendor = temp
+		
 		for i := range data.ItemCategoryVendor {
 			data.ItemCategoryVendor[i].Active = booldatatype.FromBool(true)
 		}

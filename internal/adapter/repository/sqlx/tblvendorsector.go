@@ -198,7 +198,7 @@ func (t *TblVendorSectorRepository) Create(ctx context.Context, data *tblvendors
 	_, err = tx.ExecContext(ctx, query,
 		data.SectorCode,
 		data.SectorName,
-		data.Active,
+		"Y",
 		data.CreateDate,
 		data.CreateBy,
 	)

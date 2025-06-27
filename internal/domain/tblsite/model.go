@@ -20,14 +20,14 @@ type Create struct {
 	SiteName   string                    `db:"SiteName" json:"site_name" validate:"required,max=50"`
 	Address    string                    `db:"Address" json:"address" validate:"required,max=255"`
 	Active     booldatatype.BoolDataType `db:"Active" json:"active" validate:"required"`
-	Remark     nulldatatype.NullDataType `db:"Remark" json:"remark"`
+	Remark     nulldatatype.NullDataType `db:"Remark" json:"remark" validate:"max=255"`
 	CreateDate string                    `db:"CreateDt" json:"create_date"`
 	CreateBy   string                    `db:"CreateBy" json:"create_by"`
 }
 
 type Update struct {
 	SiteCode       string                    `db:"SiteCode" json:"site_code" validate:"required,incolumn=tblsite->SiteCode,max=12"`
-	SiteName       string                    `db:"SiteName" json:"site_name" validate:"required,unique=tblsite->SiteName,max=50"`
+	SiteName       string                    `db:"SiteName" json:"site_name" validate:"required,max=50"`
 	Address        string                    `db:"Address" json:"address" validate:"required,max=255"`
 	Active         booldatatype.BoolDataType `db:"Active" json:"active" validate:"required"`
 	Remark         nulldatatype.NullDataType `db:"Remark" json:"remark"`

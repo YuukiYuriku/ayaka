@@ -9,6 +9,7 @@ type Read struct {
 	Number        uint                      `json:"number"`
 	DocNo         string                    `db:"DocNo" json:"document_number"`
 	Date          string                    `db:"DocDt" json:"document_date"`
+	TblDate       string                    `json:"table_date"`
 	WarehouseName string                    `db:"WhsName" json:"warehouse_name"`
 	WarehouseCode string                    `db:"WhsCode" json:"warehouse_code,omitempty"`
 	CurrencyCode  string                    `db:"CurCode" json:"currency_code,omitempty"`

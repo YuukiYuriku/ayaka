@@ -66,7 +66,7 @@ type ContactVendor struct {
 	DNo        string                    `db:"DNo" json:"detail_no"`
 	Name       string                    `db:"Name" json:"name" validate:"max=255"`
 	Number     string                    `db:"Number" json:"number" validate:"max=20"`
-	Active     booldatatype.BoolDataType `db:"Active" json:"active"` 
+	Active     booldatatype.BoolDataType `db:"Active" json:"active"`
 	Position   nulldatatype.NullDataType `db:"Position" json:"position" validate:"max=50"`
 	Type       nulldatatype.NullDataType `db:"Type" json:"type" validate:"max=50"`
 }
@@ -92,24 +92,24 @@ type RatingVendor struct {
 }
 
 type Create struct {
-	VendorCode         string                     `json:"vendor_code"`
-	VendorName         string                     `json:"vendor_name" validate:"required,max=255"`
-	VendorCatCode      string                     `json:"vendor_category_code" validate:"required,incolumn=tblvendorcategory->VendorCatCode"`
-	Address            nulldatatype.NullDataType  `json:"address" validate:"max=255"`
-	CityCode           string                     `json:"city_code" validate:"required,incolumn=tblcity->CityCode"`
-	PostalCode         nulldatatype.NullDataType  `json:"postal_code" validate:"max=10"`
-	Website            nulldatatype.NullDataType  `json:"website" validate:"max=50"`
-	HeadOffice         nulldatatype.NullDataType  `json:"head_office" validate:"max=60"`
-	Phone              nulldatatype.NullDataType  `json:"phone" validate:"max=20"`
-	Mobile             nulldatatype.NullDataType  `json:"mobile" validate:"max=20"`
-	Email              nulldatatype.NullDataType  `json:"email" validate:"max=255"`
-	Remark             nulldatatype.NullDataType  `json:"remark" validate:"max=255"`
-	ContactVendor      []ContactVendor      `json:"contact_vendor" validate:"dive"`
-	ItemCategoryVendor []ItemCategoryVendor `json:"item_category_vendor" validate:"dive"`
-	SectorVendor       []SectorVendor       `json:"sector_vendor" validate:"dive"`
-	RatingVendor       []RatingVendor       `json:"rating_vendor" validate:"dive"`
-	CreateBy           string                     `json:"create_by"`
-	CreateDate         string                     `json:"create_date"`
+	VendorCode         string                    `json:"vendor_code"`
+	VendorName         string                    `json:"vendor_name" validate:"required,max=255"`
+	VendorCatCode      string                    `json:"vendor_category_code" validate:"required,incolumn=tblvendorcategory->VendorCatCode"`
+	Address            nulldatatype.NullDataType `json:"address" validate:"max=255"`
+	CityCode           string                    `json:"city_code" validate:"required,incolumn=tblcity->CityCode"`
+	PostalCode         nulldatatype.NullDataType `json:"postal_code" validate:"max=10"`
+	Website            nulldatatype.NullDataType `json:"website" validate:"max=50"`
+	HeadOffice         nulldatatype.NullDataType `json:"head_office" validate:"max=60"`
+	Phone              nulldatatype.NullDataType `json:"phone" validate:"max=20"`
+	Mobile             nulldatatype.NullDataType `json:"mobile" validate:"max=20"`
+	Email              nulldatatype.NullDataType `json:"email" validate:"max=255"`
+	Remark             nulldatatype.NullDataType `json:"remark" validate:"max=255"`
+	ContactVendor      []ContactVendor           `json:"contact_vendor" validate:"dive"`
+	ItemCategoryVendor []ItemCategoryVendor      `json:"item_category_vendor" validate:"dive"`
+	SectorVendor       []SectorVendor            `json:"sector_vendor" validate:"dive"`
+	RatingVendor       []RatingVendor            `json:"rating_vendor" validate:"dive"`
+	CreateBy           string                    `json:"create_by"`
+	CreateDate         string                    `json:"create_date"`
 }
 
 type Update struct {

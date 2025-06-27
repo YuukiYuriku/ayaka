@@ -12,6 +12,7 @@ import (
 	"gitlab.com/ayaka/internal/domain/shared/booldatatype"
 	"gitlab.com/ayaka/internal/domain/shared/formatid"
 	"gitlab.com/ayaka/internal/domain/tblinitialstock"
+	"gitlab.com/ayaka/internal/pkg/customerrors"
 	"gitlab.com/ayaka/internal/pkg/pagination"
 )
 
@@ -95,18 +96,28 @@ func (s *TblInitStock) Create(ctx context.Context, data *tblinitialstock.Create,
 }
 
 func (s *TblInitStock) Update(ctx context.Context, data *tblinitialstock.Detail, userCode string) (*tblinitialstock.Detail, error) {
-	oldData, err := s.TemplateRepo.Detail(ctx, data.DocNo)
-	if err != nil {
-		return nil, fmt.Errorf("error get old data: %w", err)
-	}
-
 	lastUpDt := time.Now().Format("200601021504")
 
 	for i := 0; i < len(data.Detail); i++ {
 		data.Detail[i].Cancel = booldatatype.FromBool(data.Detail[i].Cancel.ToBool())
 	}
 
-	res, err := s.TemplateRepo.Update(ctx, data, oldData, userCode, lastUpDt)
+	prevData, err := s.TemplateRepo.Detail(ctx, data.DocNo)
+	if err != nil {
+		golog.Error(ctx, "Error get prev initial stock: "+err.Error(), err)
+		return nil, err
+	}
+
+	for i, detail := range data.Detail {
+		for _, detailPrev := range prevData.Detail {
+			if (detail.DNo == detailPrev.DNo) && (detail.Cancel == booldatatype.FromBool(false)) && (detailPrev.Cancel == booldatatype.FromBool(true)) {
+				return nil, customerrors.ErrInvalidInput
+			}
+		}
+		data.Detail[i].Cancel = booldatatype.FromBool(detail.Cancel.ToBool())
+	}
+
+	res, err := s.TemplateRepo.Update(ctx, userCode, lastUpDt, data)
 	if err != nil {
 		golog.Error(ctx, "Error update initial stock: "+err.Error(), err)
 		return nil, err

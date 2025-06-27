@@ -38,6 +38,7 @@ type Api struct {
 	TblVendorRatingHandler      api.TblVendorRatingApi              `inject:"tblVendorRatingHandler"`
 	TblVendorSectorHandler      api.TblVendorSectorApi              `inject:"tblVendorSectorHandler"`
 	TblVendorHandler            api.TblVendorApi                    `inject:"tblVendorHandler"`
+	TblHistoryOfStockHandler    api.TblHistoryOfStockApi            `inject:"tblHistoryOfStockHandler"`
 }
 
 func (a *Api) Startup() error {
@@ -214,6 +215,10 @@ func (a *Api) Startup() error {
 	vendor.Get("/:code", a.TblVendorHandler.Detail)
 	vendor.Post("/", a.TblVendorHandler.Create)
 	vendor.Put("/:code", a.TblVendorHandler.Update)
+
+	// history of stock
+	historyOfStock := v1.Group("/history-of-stock")
+	historyOfStock.Get("/", a.TblHistoryOfStockHandler.Fetch)
 
 	return nil
 }

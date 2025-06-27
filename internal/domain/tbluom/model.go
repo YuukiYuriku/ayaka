@@ -8,8 +8,8 @@ type ReadTblUom struct {
 }
 
 type CreateTblUom struct {
-	UomCode    string `db:"UomCode" json:"uom_code" validate:"required,unique=tbluom->UomCode" label:"Uom Code"`
-	UomName    string `db:"UomName" json:"uom_name" validate:"required,unique=tbluom->UomName" label:"Uom Name"`
+	UomCode    string `db:"UomCode" json:"uom_code" validate:"required,unique=tbluom->UomCode,max=16" label:"Uom Code"`
+	UomName    string `db:"UomName" json:"uom_name" validate:"required,unique=tbluom->UomName,max=80" label:"Uom Name"`
 	CreateBy   string `db:"CreateBy" json:"create_by"`
 	CreateDate string `db:"CreateDt" json:"create_date"`
 }

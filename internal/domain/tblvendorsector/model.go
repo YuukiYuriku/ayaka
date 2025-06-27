@@ -4,7 +4,7 @@ import "gitlab.com/ayaka/internal/domain/shared/booldatatype"
 
 type VendorSectorDtl struct {
 	SectorCode    string                    `db:"SectorCode" json:"sector_code"`
-	DNo           string                    `db:"DNo" json:"detail_no"`
+	DNo           string                    `db:"DNo" json:"detail_vendor_sector"`
 	SubSectorName string                    `db:"SubSectorName" validate:"required,max=255" json:"sub_sector_name"`
 	Active        booldatatype.BoolDataType `db:"Active"`
 }
@@ -42,6 +42,6 @@ type GetSector struct {
 }
 
 type GetSubSector struct {
-	DNo string `db:"DNo" json:"detail_no"`
+	DNo string `db:"DNo" json:"detail_vendor_sector"`
 	SubSectorName string `db:"SubSectorName" json:"sub_sector_name"`
 }

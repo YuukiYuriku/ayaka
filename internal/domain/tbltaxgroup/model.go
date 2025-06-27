@@ -9,7 +9,7 @@ type ReadTblTaxGroup struct {
 
 type Create struct {
 	TaxGroupCode string `json:"tax_group_code" validate:"required,max=12,unique=tbltaxgroup->TaxGroupCode"`
-	TaxGroupName string `json:"tax_group_name" validate:"required"`
+	TaxGroupName string `json:"tax_group_name" validate:"required,max=255"`
 	CreateDate   string `db:"CreateDt" json:"create_date"`
 	CreateBy     string `db:"CreateBy" json:"create_by"`
 }

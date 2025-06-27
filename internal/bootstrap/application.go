@@ -33,6 +33,7 @@ func RegisterService() {
 	appContainer.RegisterService("tblVendorRatingService", new(service.TblVendorRating))
 	appContainer.RegisterService("tblVendorSectorService", new(service.TblVendorSector))
 	appContainer.RegisterService("tblVendorService", new(service.TblVendor))
+	appContainer.RegisterService("tblHistoryOfStockService", new(service.TblHistoryOfStock))
 }
 
 func RegisterApi() {
@@ -65,6 +66,7 @@ func RegisterApi() {
 	appContainer.RegisterService("tblVendorRatingHandler", new(api.TblVendorRatingHandler))
 	appContainer.RegisterService("tblVendorSectorHandler", new(api.TblVendorSectorHandler))
 	appContainer.RegisterService("tblVendorHandler", new(api.TblVendorHandler))
+	appContainer.RegisterService("tblHistoryOfStockHandler", new(api.TblHistoryOfStockHandler))
 
 	appContainer.RegisterService("api", new(application.Api))
 

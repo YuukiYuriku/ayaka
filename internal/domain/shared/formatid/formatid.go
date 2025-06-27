@@ -52,7 +52,9 @@ func (s *GenerateIDHandler) GenerateID(ctx context.Context, category string) (st
 		return "", err
 	}
 
-	query := fmt.Sprintf("SELECT %s AS LastId FROM %s ORDER BY %s DESC LIMIT 1", primKey, table, primKey)
+	date := "'%" +time.Now().Format("01/06") + "%'"
+
+	query := fmt.Sprintf("SELECT %s AS LastId FROM %s WHERE %s LIKE %s ORDER BY %s DESC LIMIT 1", primKey, table, primKey, date, primKey)
 	var lastId GenerateIDModel
 
 	err = s.DB.GetContext(ctx, &lastId, query)

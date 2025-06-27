@@ -199,7 +199,7 @@ func (t *TblStockSummaryRepository) GetItem(ctx context.Context, itemName, itemC
 			s.ItCode,
 			i.ItName,
 			s.BatchNo,
-			(Qty - Qty2 - Qty3) AS Stock,
+			Qty AS Stock,
 			u.UomName
 		FROM tblstocksummary s
 		JOIN tblitem i ON s.ItCode = i.ItCode

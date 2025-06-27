@@ -14,4 +14,5 @@ var (
 	ErrKeyNotFound = errors.New("key not found")
 	ErrInvalidArrayFormat = errors.New("invalid array format")
 	ErrInvalidQuantity = errors.New("invalid quantity")
+	ErrInvalidInput = errors.New("invalid input")
 )
