@@ -1,9 +1,12 @@
 package tblstockmutationdtl
 
 type Detail struct {
+	DocNo string `db:"DocNo" json:"document_number"`
+	DNo      string  `db:"DNo" json:"detail_number"`
 	ItemCode string  `db:"ItCode" json:"item_code"`
 	ItemName string  `db:"ItName" json:"item_name"`
 	Batch    string  `db:"BatchNo" json:"batch"`
+	Source   string  `db:"Source" json:"source"`
 	Stock    float32 `db:"Stock" json:"stock"`
 	Quantity float32 `db:"Qty" json:"quantity"`
 	Uom      string  `db:"UomName" json:"uom"`

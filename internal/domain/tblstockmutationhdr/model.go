@@ -11,6 +11,7 @@ type Fetch struct {
 	DocNo     string                    `db:"DocNo" json:"document_number"`
 	Cancel    booldatatype.BoolDataType `db:"CancelInd" json:"cancel"`
 	Date      string                    `db:"DocDt" json:"date"`
+	TblDate   string 					`json:"table_date"`
 	Warehouse string                    `db:"WhsName" json:"warehouse"`
 	FromTo    string                    `db:"FromTo" json:"from_to"`
 	ItemName  string                    `db:"ItName" json:"item_name"`
@@ -20,7 +21,7 @@ type Fetch struct {
 }
 
 type Detail struct {
-	DocNo         string                       `db:"DocNo" json:"document_number"`
+	DocNo         string                       `db:"DocNo" json:"document_number" validate:"incolumn=tblstockmutationhdr->DocNo"`
 	Date          string                       `db:"DocDt" json:"date"`
 	WarehouseCode string                       `db:"WhsCode" json:"warehouse_code"`
 	WarehouseName string                       `db:"WhsName" json:"warehouse_name"`
@@ -28,12 +29,12 @@ type Detail struct {
 	Cancel        booldatatype.BoolDataType    `db:"CancelInd" json:"cancel"`
 	Remark        nulldatatype.NullDataType    `db:"Remark" json:"remark"`
 	FromArray     []tblstockmutationdtl.Detail `db:"from_array" json:"from_array"`
-	ToArray       []tblstockmutationdtl.Detail `db:"to_array" json:"to_data"`
+	ToArray       []tblstockmutationdtl.Detail `db:"to_array" json:"to_array"`
 }
 
 type Create struct {
 	DocNo         string                       `json:"document_number"`
-	DocDate       string                       `json:"document_date" validate:"required"`
+	DocDate       string                       `json:"date" validate:"required"`
 	WarehouseCode string                       `json:"warehouse_code" validate:"required,incolumn=tblwarehouse->WhsCode" label:"Warehouse"`
 	BatchNo       string                       `json:"batch"`
 	Source        string                       `json:"source"`

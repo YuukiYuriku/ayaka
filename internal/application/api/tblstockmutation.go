@@ -22,7 +22,7 @@ type TblStockMutationApi interface {
 	Fetch(c *fiber.Ctx) error
 	Detail(c *fiber.Ctx) error
 	Create(c *fiber.Ctx) error
-	// Update(c *fiber.Ctx) error
+	Update(c *fiber.Ctx) error
 }
 
 type TblStockMutationHandler struct {
@@ -140,4 +140,46 @@ func (h *TblStockMutationHandler) Create(c *fiber.Ctx) error {
 	go h.Log.LogUserInfo(user.UserCode, "INFO", fmt.Sprintf("Create stock mutation %s", result.DocNo))
 
 	return c.Status(fiber.StatusCreated).JSON(formatter.NewSuccessResponse(formatter.Success, result))
+}
+
+func (h *TblStockMutationHandler) Update(c *fiber.Ctx) error {
+	var req *tblstockmutationhdr.Detail
+
+	code := c.Params("code")
+	user := c.Locals("user").(*jwt.Claims)
+
+	if err := c.BodyParser(&req); err != nil {
+		go h.Log.LogUserInfo(user.UserCode, "ERROR", fmt.Sprintf("Internal server error parse update stock mutation: %s", err.Error()))
+		return err
+	}
+	req.DocNo = strings.ReplaceAll(code, "-", "/")
+
+	if len(req.FromArray) == 0 || len(req.ToArray) == 0 {
+		go h.Log.LogUserInfo(user.UserCode, "WARN", "Detail stock mutation is empty")
+		newErr := "details:Detail must contain atleast 1 data"
+		return c.Status(fiber.StatusBadRequest).JSON(formatter.NewErrorFieldResponse(formatter.InvalidRequest, "Failed to create stock mutation", newErr))
+	}
+
+	if err := h.Validator.Validate(c.Context(), req); err != nil {
+		go h.Log.LogUserInfo(user.UserCode, "WARN", fmt.Sprintf("Error validate update stock mutation: %s", err.Error()))
+		return c.Status(fiber.StatusBadRequest).JSON(formatter.NewErrorFieldResponse(formatter.InvalidRequest, "Failed to Update stock mutation", err.Error()))
+	}
+
+	result, err := h.Service.Update(c.Context(), req, user.UserCode)
+	if err != nil {
+		if errors.Is(err, customerrors.ErrNoDataEdited) {
+			go h.Log.LogUserInfo(user.UserCode, "INFO", fmt.Sprintf("Update data stock mutation %s", req.DocNo))
+			return c.Status(fiber.StatusOK).JSON(formatter.NewSuccessResponse(formatter.Success, result))
+		}
+		if errors.Is(err, customerrors.ErrInvalidInput) {
+			go h.Log.LogUserInfo(user.UserCode, "INFO", fmt.Sprintf("Update data stock mutation %s", req.DocNo))
+			return c.Status(fiber.StatusOK).JSON(formatter.NewSuccessResponse(formatter.Success, result))
+		}
+		go h.Log.LogUserInfo(user.UserCode, "ERROR", fmt.Sprintf("Internal server error update stock mutation: %s", err.Error()))
+		return err
+	}
+
+	go h.Log.LogUserInfo(user.UserCode, "INFO", fmt.Sprintf("Update data stock mutation %s", req.DocNo))
+
+	return c.Status(fiber.StatusOK).JSON(formatter.NewSuccessResponse(formatter.Success, result))
 }
