@@ -71,15 +71,8 @@ func (s *TblStockAdjust) Create(ctx context.Context, data *tblstockadjustmenthdr
 	}
 	data.Date = t.Format("20060102")
 
-	total, err := s.ID.GetLastDetailNumber(ctx, "StockAdjustmentDtl")
-	if err != nil {
-		return nil, err
-	}
-
 	for i := 0; i < len(data.Details); i++ {
-		total++
-
-		data.Details[i].DNo = fmt.Sprintf("%03d", total)
+		data.Details[i].DNo = fmt.Sprintf("%03d", i+1)
 
 		if data.Details[i].Batch == "" {
 			data.Details[i].Batch = data.Date

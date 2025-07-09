@@ -104,7 +104,8 @@ func (t *TblStockAdjustRepository) Fetch(ctx context.Context, doc, warehouse, st
 	for i, detail := range data {
 		j++
 		detail.Number = uint(j)
-		detail.Date = share.FormatDate(detail.Date)
+		detail.TblDate = share.FormatDate(detail.Date)
+		detail.Date = share.ToDatePicker(detail.Date)
 		docsNo[i] = detail.DocNo
 	}
 
@@ -222,50 +223,56 @@ func (t *TblStockAdjustRepository) Detail(ctx context.Context, docNo string) (*t
 }
 
 func (t *TblStockAdjustRepository) Create(ctx context.Context, data *tblstockadjustmenthdr.Create) (*tblstockadjustmenthdr.Create, error) {
-	// Mulai transaksi
-	tx, err := t.DB.BeginTxx(ctx, nil)
-	if err != nil {
-		log.Printf("Failed to start transaction: %+v", err)
-		return nil, fmt.Errorf("error starting transaction: %w", err)
-	}
-
-	// Pastikan rollback selalu dijalankan jika terjadi error
-	var txErr error
-	defer func() {
-		if txErr != nil {
-			if rbErr := tx.Rollback(); rbErr != nil {
-				log.Printf("Failed to rollback transaction: %+v", rbErr)
-			}
-		}
-	}()
-
-	countDetail := len(data.Details)
-	var args []interface{}
-
-	query := `INSERT INTO tblstockadjustmenthdr (
+	query := `INSERT INTO tblstockadjustmenthdr 
+	(
 		DocNo,
 		DocDt,
 		WhsCode,
 		Remark,
 		CreateDt,
 		CreateBy
-	) VALUES (?, ?, ?, ?, ?, ?);`
-	args = []interface{}{
+	) VALUES `
+
+	var args []interface{}
+	var placeholders []string
+
+	placeholders = append(placeholders, "(?, ?, ?, ?, ?, ?);")
+	args = append(args,
 		data.DocNo,
 		data.Date,
 		data.WarehouseCode,
 		data.Remark,
 		data.CreateDate,
 		data.CreateBy,
-	}
+	)
 
-	_, err = tx.ExecContext(ctx, query, args...)
+	// transaction begin
+	var err error
+	tx, err := t.DB.BeginTxx(ctx, nil)
 	if err != nil {
-		return nil, fmt.Errorf("failed to insert header: %w", err)
+		log.Printf("Failed to start transaction: %+v", err)
+		return nil, fmt.Errorf("error starting transaction: %w", err)
 	}
 
-	if countDetail > 0 {
-		// Insert ke tabel detail
+	// Pastikan rollback dipanggil jika transaksi tidak berhasil
+	defer func() {
+		if err != nil {
+			// Rollback jika error terjadi
+			if rbErr := tx.Rollback(); rbErr != nil {
+				log.Printf("Failed to rollback transaction: %+v", rbErr)
+			}
+		}
+	}()
+
+	// insert header
+	query += strings.Join(placeholders, "")
+	if _, err = tx.ExecContext(ctx, query, args...); err != nil {
+		log.Printf("Error insert header: %+v", err)
+		return nil, fmt.Errorf("error Insert Header: %w", err)
+	}
+
+	if len(data.Details) > 0 {
+		// detail query
 		query = `INSERT INTO tblstockadjustmentdtl (
 			DocNo,
 			DNo,
@@ -282,75 +289,33 @@ func (t *TblStockAdjustRepository) Create(ctx context.Context, data *tblstockadj
 			CreateDt,
 			CreateBy
 		) VALUES `
-		var placeholders []string
-		var whenClauses []string
-		var movementValues []string
+
+		placeholders = placeholders[:0]
 		args = args[:0]
-		var argsClauses, argsMov []interface{}
 
-		for _, detail := range data.Details {
-			placeholders = append(placeholders, `(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
-			args = append(args,
-				data.DocNo,
-				detail.DNo,
-				detail.ItemCode,
-				detail.Batch,
-				"-",
-				"-",
-				detail.StockSystem,
-				detail.StockSystem,
-				detail.StockSystem,
-				detail.StockActual,
-				detail.StockActual,
-				detail.StockActual,
-				data.CreateDate,
-				data.CreateBy,
-			)
+		// stock summary query
+		queryStockSummary := `INSERT INTO tblstocksummary (
+			WhsCode,
+			Lot,
+			Bin,
+			Source,
+			ItCode,
+			BatchNo,
+			Qty,
+			Qty2,
+			Qty3,
+			CreateBy,
+			CreateDt
+		) VALUES `
+		var placeholdersStockSummary []string
+		var argsStockSummary []interface{}
 
-			whenClauses = append(whenClauses, `WHEN WhsCode = ? AND ItCode = ? THEN ?`)
-			argsClauses = append(argsClauses, data.WarehouseCode, detail.ItemCode, detail.StockActual)
-
-			movementValues = append(movementValues, `(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
-			argsMov = append(argsMov,
-				"Stock Adjustment",
-				data.DocNo,
-				detail.DNo,
-				data.Date,
-				data.WarehouseCode,
-				detail.Source,
-				detail.ItemCode,
-				detail.Batch,
-				detail.StockActual,
-				detail.StockActual,
-				detail.StockActual,
-				data.Remark,
-				data.CreateBy,
-				data.CreateDate,
-			)
-		}
-
-		query += strings.Join(placeholders, ",")
-		_, err = tx.ExecContext(ctx, query, args...)
-		if err != nil {
-			return nil, fmt.Errorf("failed to insert details: %w", err)
-		}
-
-		// Update ke tabel stock summary
-		querySum := `UPDATE tblstocksummary 
-				SET
-					Qty2 = CASE ` + strings.Join(whenClauses, " ") + `
-					ELSE Qty2
-					END,
-					LastUpBy = ?,
-					LastUpDt = ?
-				WHERE WhsCode = ?;`
-		argsClauses = append(argsClauses, data.CreateBy, data.CreateDate, data.WarehouseCode)
-
-		// Insert ke tabel stock movement
-		queryMov := `INSERT INTO tblstockmovement (
+		// stock movement query
+		queryStockMovement := `INSERT INTO tblstockmovement (
 			DocType,
 			DocNo,
 			DNo,
+			CancelInd,
 			DocDt,
 			WhsCode,
 			Source,
@@ -363,24 +328,324 @@ func (t *TblStockAdjustRepository) Create(ctx context.Context, data *tblstockadj
 			CreateBy,
 			CreateDt
 		) VALUES `
+		var placeholdersStockMovement []string
+		var argsStockMovement []interface{}
 
-		_, err = tx.ExecContext(ctx, querySum, argsClauses...)
-		if err != nil {
-			return nil, fmt.Errorf("error executing update query stock summary: %w", err)
+		// stock history of stock
+		queryHistory := `INSERT INTO tblhistoryofstock (
+			ItCode,
+			BatchNo,
+			Source,
+			CancelInd,
+			CreateBy,
+			CreateDt
+		) VALUES `
+		var placeholdersHistory []string
+		var argsHistory []interface{}
+
+		for i, detail := range data.Details {
+			balance := detail.StockActual - detail.StockSystem
+
+			// detail
+			placeholders = append(placeholders, "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
+			args = append(args,
+				data.DocNo,
+				fmt.Sprintf("%03d", i+1),
+				detail.ItemCode,
+				detail.Batch,
+				"-",
+				"-",
+				detail.StockSystem,
+				0,
+				0,
+				detail.StockActual,
+				0,
+				0,
+				data.CreateDate,
+				data.CreateBy,
+			)
+
+			// stock summary
+			placeholdersStockSummary = append(placeholdersStockSummary, "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
+
+			// stock movement
+			placeholdersStockMovement = append(placeholdersStockMovement, "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
+
+			if balance > 0 {
+				argsStockSummary = append(argsStockSummary,
+					data.WarehouseCode,
+					"-",
+					"-",
+					detail.Source,
+					detail.ItemCode,
+					detail.Batch,
+					0,
+					balance,
+					0,
+					data.CreateBy,
+					data.Date,
+				)
+				argsStockMovement = append(argsStockMovement,
+					"Stock Adjustment",
+					data.DocNo,
+					detail.DNo,
+					"N",
+					data.Date,
+					data.WarehouseCode,
+					detail.Source,
+					detail.ItemCode,
+					detail.Batch,
+					0,
+					balance,
+					0,
+					data.Remark,
+					data.CreateBy,
+					data.Date,
+				)
+			} else {
+				argsStockSummary = append(argsStockSummary,
+					data.WarehouseCode,
+					"-",
+					"-",
+					detail.Source,
+					detail.ItemCode,
+					detail.Batch,
+					0,
+					0,
+					(0 - balance),
+					data.CreateBy,
+					data.Date,
+				)
+				argsStockMovement = append(argsStockMovement,
+					"Stock Adjustment",
+					data.DocNo,
+					detail.DNo,
+					"N",
+					data.Date,
+					data.WarehouseCode,
+					detail.Source,
+					detail.ItemCode,
+					detail.Batch,
+					0,
+					0,
+					(0 - balance),
+					data.Remark,
+					data.CreateBy,
+					data.Date,
+				)
+			}
+
+			// history of stock
+			placeholdersHistory = append(placeholdersHistory, "(?, ?, ?, ?, ?, ?)")
+			argsHistory = append(argsHistory,
+				detail.ItemCode,
+				detail.Batch,
+				detail.Source,
+				"N",
+				data.CreateBy,
+				data.Date,
+			)
 		}
 
-		queryMov += strings.Join(movementValues, ",")
-		_, err = tx.ExecContext(ctx, queryMov, argsMov...)
-		if err != nil {
-			return nil, fmt.Errorf("failed to insert stock movement: %w", err)
+		// insert detail
+		query += strings.Join(placeholders, ",") + ";"
+		if _, err = tx.ExecContext(ctx, query, args...); err != nil {
+			log.Printf("Error insert detail: %+v", err)
+			return nil, fmt.Errorf("error Insert Detail: %w", err)
+		}
+
+		// insert stock summary
+		queryStockSummary += strings.Join(placeholdersStockSummary, ",") + `;`
+		if _, err = tx.ExecContext(ctx, queryStockSummary, argsStockSummary...); err != nil {
+			log.Printf("Error insert stock summary: %+v", err)
+			return nil, fmt.Errorf("error Insert Stock Summary: %w", err)
+		}
+
+		// insert stock movement
+		queryStockMovement += strings.Join(placeholdersStockMovement, ",") + ";"
+		if _, err = tx.ExecContext(ctx, queryStockMovement, argsStockMovement...); err != nil {
+			log.Printf("Error insert stock movement: %+v", err)
+			return nil, fmt.Errorf("error Insert Stock Movement: %w", err)
+		}
+
+		// insert history
+		queryHistory += strings.Join(placeholdersHistory, ",") + ";"
+		if _, err = tx.ExecContext(ctx, queryHistory, argsHistory...); err != nil {
+			log.Printf("Error insert history of stock: %+v", err)
+			return nil, fmt.Errorf("error Insert History of Stock: %w", err)
 		}
 	}
 
-	// Commit transaksi
-	if err := tx.Commit(); err != nil {
+	// Commit the transaction
+	if err = tx.Commit(); err != nil {
 		log.Printf("Failed to commit transaction: %+v", err)
 		return nil, fmt.Errorf("error committing transaction: %w", err)
 	}
 
 	return data, nil
 }
+
+
+// func (t *TblStockAdjustRepository) Create(ctx context.Context, data *tblstockadjustmenthdr.Create) (*tblstockadjustmenthdr.Create, error) {
+// 	// Mulai transaksi
+// 	tx, err := t.DB.BeginTxx(ctx, nil)
+// 	if err != nil {
+// 		log.Printf("Failed to start transaction: %+v", err)
+// 		return nil, fmt.Errorf("error starting transaction: %w", err)
+// 	}
+
+// 	// Pastikan rollback selalu dijalankan jika terjadi error
+// 	var txErr error
+// 	defer func() {
+// 		if txErr != nil {
+// 			if rbErr := tx.Rollback(); rbErr != nil {
+// 				log.Printf("Failed to rollback transaction: %+v", rbErr)
+// 			}
+// 		}
+// 	}()
+
+// 	countDetail := len(data.Details)
+// 	var args []interface{}
+
+// 	query := `INSERT INTO tblstockadjustmenthdr (
+// 		DocNo,
+// 		DocDt,
+// 		WhsCode,
+// 		Remark,
+// 		CreateDt,
+// 		CreateBy
+// 	) VALUES (?, ?, ?, ?, ?, ?);`
+// 	args = []interface{}{
+// 		data.DocNo,
+// 		data.Date,
+// 		data.WarehouseCode,
+// 		data.Remark,
+// 		data.CreateDate,
+// 		data.CreateBy,
+// 	}
+
+// 	_, err = tx.ExecContext(ctx, query, args...)
+// 	if err != nil {
+// 		return nil, fmt.Errorf("failed to insert header: %w", err)
+// 	}
+
+// 	if countDetail > 0 {
+// 		// Insert ke tabel detail
+// 		query = `INSERT INTO tblstockadjustmentdtl (
+// 			DocNo,
+// 			DNo,
+// 			ItCode,
+// 			BatchNo,
+// 			Lot,
+// 			Bin,
+// 			Qty,
+// 			Qty2,
+// 			Qty3,
+// 			QtyActual,
+// 			QtyActual2,
+// 			QtyActual3,
+// 			CreateDt,
+// 			CreateBy
+// 		) VALUES `
+// 		var placeholders []string
+// 		var whenClauses []string
+// 		var movementValues []string
+// 		args = args[:0]
+// 		var argsClauses, argsMov []interface{}
+
+// 		for _, detail := range data.Details {
+// 			placeholders = append(placeholders, `(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+// 			args = append(args,
+// 				data.DocNo,
+// 				detail.DNo,
+// 				detail.ItemCode,
+// 				detail.Batch,
+// 				"-",
+// 				"-",
+// 				detail.StockSystem,
+// 				detail.StockSystem,
+// 				detail.StockSystem,
+// 				detail.StockActual,
+// 				detail.StockActual,
+// 				detail.StockActual,
+// 				data.CreateDate,
+// 				data.CreateBy,
+// 			)
+
+// 			whenClauses = append(whenClauses, `WHEN WhsCode = ? AND ItCode = ? THEN ?`)
+// 			argsClauses = append(argsClauses, data.WarehouseCode, detail.ItemCode, detail.StockActual)
+
+// 			movementValues = append(movementValues, `(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+// 			argsMov = append(argsMov,
+// 				"Stock Adjustment",
+// 				data.DocNo,
+// 				detail.DNo,
+// 				data.Date,
+// 				data.WarehouseCode,
+// 				detail.Source,
+// 				detail.ItemCode,
+// 				detail.Batch,
+// 				detail.StockActual,
+// 				detail.StockActual,
+// 				detail.StockActual,
+// 				data.Remark,
+// 				data.CreateBy,
+// 				data.CreateDate,
+// 			)
+// 		}
+
+// 		query += strings.Join(placeholders, ",")
+// 		_, err = tx.ExecContext(ctx, query, args...)
+// 		if err != nil {
+// 			return nil, fmt.Errorf("failed to insert details: %w", err)
+// 		}
+
+// 		// Update ke tabel stock summary
+// 		querySum := `UPDATE tblstocksummary 
+// 				SET
+// 					Qty2 = CASE ` + strings.Join(whenClauses, " ") + `
+// 					ELSE Qty2
+// 					END,
+// 					LastUpBy = ?,
+// 					LastUpDt = ?
+// 				WHERE WhsCode = ?;`
+// 		argsClauses = append(argsClauses, data.CreateBy, data.CreateDate, data.WarehouseCode)
+
+// 		// Insert ke tabel stock movement
+// 		queryMov := `INSERT INTO tblstockmovement (
+// 			DocType,
+// 			DocNo,
+// 			DNo,
+// 			DocDt,
+// 			WhsCode,
+// 			Source,
+// 			ItCode,
+// 			BatchNo,
+// 			Qty,
+// 			Qty2,
+// 			Qty3,
+// 			Remark,
+// 			CreateBy,
+// 			CreateDt
+// 		) VALUES `
+
+// 		_, err = tx.ExecContext(ctx, querySum, argsClauses...)
+// 		if err != nil {
+// 			return nil, fmt.Errorf("error executing update query stock summary: %w", err)
+// 		}
+
+// 		queryMov += strings.Join(movementValues, ",")
+// 		_, err = tx.ExecContext(ctx, queryMov, argsMov...)
+// 		if err != nil {
+// 			return nil, fmt.Errorf("failed to insert stock movement: %w", err)
+// 		}
+// 	}
+
+// 	// Commit transaksi
+// 	if err := tx.Commit(); err != nil {
+// 		log.Printf("Failed to commit transaction: %+v", err)
+// 		return nil, fmt.Errorf("error committing transaction: %w", err)
+// 	}
+
+// 	return data, nil
+// }

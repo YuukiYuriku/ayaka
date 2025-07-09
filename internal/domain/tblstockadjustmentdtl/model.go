@@ -3,7 +3,7 @@ package tblstockadjustmentdtl
 import "gitlab.com/ayaka/internal/domain/shared/nulldatatype"
 
 type Detail struct {
-	DocNo         string                    `db:"DocNo" json:"documentnumber"`
+	DocNo         string                    `db:"DocNo" json:"document_number"`
 	DNo           string                    `db:"DNo" json:"d_no"`
 	ItemName      string                    `db:"ItName" json:"item_name"`
 	Batch         string                    `db:"BatchNo" json:"batch"`

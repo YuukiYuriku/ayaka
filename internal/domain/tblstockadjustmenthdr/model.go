@@ -11,6 +11,7 @@ type Read struct {
 	Date          string `db:"DocDt" json:"date"`
 	WarehouseCode string `db:"WhsCode" json:"warehouse_code"`
 	WarehouseName string `db:"WhsName" json:"warehouse_name"`
+	TblDate		  string `json:"table_date"`
 }
 
 type Detail struct {
@@ -22,6 +23,7 @@ type Detail struct {
 	Remark        nulldatatype.NullDataType      `db:"Remark" json:"remark"`
 	Details       []tblstockadjustmentdtl.Detail `db:"Detail" json:"details"`
 	TotalBalance  float32                        `json:"total_balance"`
+	TblDate       string 						 `json:"table_date"`
 }
 
 type Create struct {
