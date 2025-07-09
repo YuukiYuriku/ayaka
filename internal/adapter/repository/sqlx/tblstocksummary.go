@@ -30,9 +30,11 @@ func (t *TblStockSummaryRepository) Fetch(ctx context.Context, warehouse []strin
 	var search []interface{}
 	var endquery []string
 
-	countQuery := `SELECT COUNT(*) 
-				FROM tblstocksummary s
-				JOIN tblitem i ON s.ItCode = i.ItCode`
+	countQuery := `
+		SELECT COUNT(*) FROM (
+			SELECT 1
+			FROM tblstocksummary s
+			JOIN tblitem i ON s.ItCode = i.ItCode`
 
 	if date != "" {
 		endquery = append(endquery, `s.CreateDt <= ?`)
@@ -63,6 +65,12 @@ func (t *TblStockSummaryRepository) Fetch(ctx context.Context, warehouse []strin
 		countQuery += " WHERE " + strings.Join(endquery, " AND ")
 	}
 
+	countQuery += `
+			GROUP BY s.WhsCode, s.Source, s.ItCode
+		) AS grouped`
+
+	fmt.Println("Query count: ", countQuery)
+	fmt.Println("args: ", search)
 	if err := t.DB.GetContext(ctx, &totalRecords, countQuery, search...); err != nil {
 		return nil, fmt.Errorf("error counting records: %w", err)
 	}
@@ -91,18 +99,22 @@ func (t *TblStockSummaryRepository) Fetch(ctx context.Context, warehouse []strin
 			s.ItCode AS ItCode,
 			i.ItCodeInternal AS ItCodeInternal,
 			i.ItName AS ItName,
+			c.ItCtName as ItCtName,
 			i.ActInd AS ActInd,
-			(Qty - Qty2 - Qty3) AS Stock,
+			SUM(Qty + Qty2 - Qty3) AS Stock,
 			u.UomName AS UomName
 		FROM tblstocksummary s
 		JOIN tblwarehouse w ON s.WhsCode = w.WhsCode
 		JOIN tblitem i ON s.ItCode = i.ItCode
+		JOIN tblitemcategory c ON c.ItCtCode = i.ItCtCode
 		JOIN tbluom u ON i.PurchaseUOMCode = u.UomCode`
 
 	if len(endquery) > 0 {
 		query += " WHERE " + strings.Join(endquery, " AND ")
 	}
-	query += " LIMIT ? OFFSET ?"
+
+	query += ` GROUP BY s.WhsCode, s.ItCode, w.WhsName
+		LIMIT ? OFFSET ?`
 	search = append(search, param.PageSize, offset)
 
 	if err := t.DB.SelectContext(ctx, &data, query, search...); err != nil {
@@ -122,14 +134,18 @@ func (t *TblStockSummaryRepository) Fetch(ctx context.Context, warehouse []strin
 	}
 
 	j := offset
+	var filtered []*tblstocksummary.Fetch
 	for _, detail := range data {
-		j++
-		detail.Number = uint(j)
+		if detail.Quantity != 0 {
+			j++
+			detail.Number = uint(j)
+			filtered = append(filtered, detail)
+		}
 	}
 
 	// response
 	response := &pagination.PaginationResponse{
-		Data:         data,
+		Data:         filtered,
 		TotalRecords: totalRecords,
 		TotalPages:   totalPages,
 		CurrentPage:  param.Page,
@@ -146,11 +162,11 @@ func (t *TblStockSummaryRepository) GetItem(ctx context.Context, itemName, itemC
 	var search []interface{}
 	var endquery []string
 
-	countQuery := `SELECT COUNT(*) 
-				FROM tblstocksummary s
-				JOIN tblitem i ON s.ItCode = i.ItCode`
-
-	endquery = append(endquery, ` s.WhsCode = ? `)
+	countQuery := `SELECT COUNT(*) FROM (
+		SELECT 1
+		FROM tblstocksummary s
+		JOIN tblitem i ON s.ItCode = i.ItCode
+		WHERE s.WhsCode = ?`
 	search = append(search, warehouse)
 
 	if itemName != "" {
@@ -169,8 +185,13 @@ func (t *TblStockSummaryRepository) GetItem(ctx context.Context, itemName, itemC
 	}
 
 	if len(endquery) > 0 {
-		countQuery += " WHERE " + strings.Join(endquery, " AND ")
+		countQuery += " AND " + strings.Join(endquery, " AND ")
 	}
+	countQuery += " AND i.ActInd = 'Y'"
+
+	countQuery += `
+		GROUP BY i.ItName, s.BatchNo
+	) AS grouped`
 
 	if err := t.DB.GetContext(ctx, &totalRecords, countQuery, search...); err != nil {
 		return nil, fmt.Errorf("error counting records: %w", err)
@@ -199,23 +220,28 @@ func (t *TblStockSummaryRepository) GetItem(ctx context.Context, itemName, itemC
 			s.ItCode,
 			i.ItName,
 			s.BatchNo,
-			Qty AS Stock,
+			SUM(Qty + Qty2 - Qty3) AS Stock,
 			u.UomName
 		FROM tblstocksummary s
 		JOIN tblitem i ON s.ItCode = i.ItCode
-		JOIN tbluom u ON i.PurchaseUOMCode = u.UomCode `
+		JOIN tbluom u ON i.PurchaseUOMCode = u.UomCode
+		WHERE s.WhsCode = ? `
 
 	if len(endquery) > 0 {
-		query += " WHERE " + strings.Join(endquery, " AND ")
+		query += " AND " + strings.Join(endquery, " AND ")
 	}
-	query += " LIMIT ? OFFSET ?"
+	query += " AND i.ActInd = 'Y'"
+
+	query += `
+			GROUP BY s.ItCode, s.BatchNo
+			LIMIT ? OFFSET ?`
 	search = append(search, param.PageSize, offset)
 
 	if err := t.DB.SelectContext(ctx, &data, query, search...); err != nil {
 		log.Printf("Error executing query: %v", err)
 		if errors.Is(err, sql.ErrNoRows) {
 			return &pagination.PaginationResponse{
-				Data:         make([]*tblstocksummary.Fetch, 0),
+				Data:         make([]*tblstocksummary.GetItem, 0),
 				TotalRecords: 0,
 				TotalPages:   0,
 				CurrentPage:  param.Page,
@@ -228,14 +254,18 @@ func (t *TblStockSummaryRepository) GetItem(ctx context.Context, itemName, itemC
 	}
 
 	j := offset
+	var filtered []*tblstocksummary.GetItem
 	for _, detail := range data {
-		j++
-		detail.Number = uint(j)
+		if detail.Stock != 0 {
+			j++
+			detail.Number = uint(j)
+			filtered = append(filtered, detail)
+		}
 	}
 
 	// response
 	response := &pagination.PaginationResponse{
-		Data:         data,
+		Data:         filtered,
 		TotalRecords: totalRecords,
 		TotalPages:   totalPages,
 		CurrentPage:  param.Page,

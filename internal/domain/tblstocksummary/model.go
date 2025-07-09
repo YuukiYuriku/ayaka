@@ -20,6 +20,7 @@ type Fetch struct {
 	ItemCode      string                    `db:"ItCode" json:"item_code"`
 	LocalCode     nulldatatype.NullDataType `db:"ItCodeInternal" json:"local_code"`
 	ItemName      string                    `db:"ItName" json:"item_name"`
+	Catgory       string                    `db:"ItCtName" json:"item_category_name"`
 	Active        booldatatype.BoolDataType `db:"ActInd" json:"active"`
 	Quantity      float32                   `db:"Stock" json:"quantity"`
 	Uom           string                    `db:"UomName" json:"uom"`
