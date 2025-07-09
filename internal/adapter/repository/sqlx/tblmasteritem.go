@@ -234,7 +234,7 @@ func (t *TblItemRepository) Create(ctx context.Context, data *tblmasteritem.Crea
 		}
 	}
 
-	query := "SELECT ItCode, ItName FROM tblitem ORDER BY CreateDt DESC LIMIT 1"
+	query := "SELECT ItCode, ItName FROM tblitem ORDER BY ItCode DESC LIMIT 1"
 	var check tblmasteritem.Check
 	var id string
 	prefixId := "ITC0004"
@@ -301,7 +301,7 @@ func (t *TblItemRepository) Create(ctx context.Context, data *tblmasteritem.Crea
 		data.InventoryItem,
 		data.SalesItem,
 		data.PurchaseItem,
-		data.ServiceItem,
+		"N",
 		data.TaxLiable,
 		data.CreateBy,
 		data.Source,
