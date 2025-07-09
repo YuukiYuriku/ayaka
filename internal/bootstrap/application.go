@@ -34,6 +34,9 @@ func RegisterService() {
 	appContainer.RegisterService("tblVendorSectorService", new(service.TblVendorSector))
 	appContainer.RegisterService("tblVendorService", new(service.TblVendor))
 	appContainer.RegisterService("tblHistoryOfStockService", new(service.TblHistoryOfStock))
+	appContainer.RegisterService("tblDailyStockMovementService", new(service.TblDailyStockMovement))
+	appContainer.RegisterService("tblDirectPurchaseRcvService", new(service.TblDirectPurchaseRcv))
+	appContainer.RegisterService("tblDirectSalesDeliveryService", new(service.TblDirectSalesDelivery))
 }
 
 func RegisterApi() {
@@ -67,6 +70,9 @@ func RegisterApi() {
 	appContainer.RegisterService("tblVendorSectorHandler", new(api.TblVendorSectorHandler))
 	appContainer.RegisterService("tblVendorHandler", new(api.TblVendorHandler))
 	appContainer.RegisterService("tblHistoryOfStockHandler", new(api.TblHistoryOfStockHandler))
+	appContainer.RegisterService("tblDailyStockMovementHandler", new(api.TblDailyStockMovementHandler))
+	appContainer.RegisterService("tblDirectPurchaseRcvHandler", new(api.TblDirectPurchaseRcvHandler))
+	appContainer.RegisterService("tblDirectSalesDeliveryHandler", new(api.TblDirectSalesDeliveryHandler))
 
 	appContainer.RegisterService("api", new(application.Api))
 
