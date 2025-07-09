@@ -7,5 +7,5 @@ import (
 )
 
 type Repository interface {
-	Fetch(ctx context.Context, item, batch string, param *pagination.PaginationParam) (*pagination.PaginationResponse, error)
+	Fetch(ctx context.Context, item, batch, source string, param *pagination.PaginationParam) (*pagination.PaginationResponse, error)
 }

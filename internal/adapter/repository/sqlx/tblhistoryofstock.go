@@ -16,20 +16,21 @@ type TblHistoryOfStockRepository struct {
 	DB *repository.Sqlx `inject:"database"`
 }
 
-func (t *TblHistoryOfStockRepository) Fetch(ctx context.Context, item, batch string, param *pagination.PaginationParam) (*pagination.PaginationResponse, error) {
+func (t *TblHistoryOfStockRepository) Fetch(ctx context.Context, item, batch, source string, param *pagination.PaginationParam) (*pagination.PaginationResponse, error) {
 	var totalRecords int
 	var args []interface{}
 	
 	searchItem := "%" + item + "%"
 	searchBatch := "%" + batch + "%"
+	searchSource := "%" + source + "%"
 	
 	countQuery := `SELECT COUNT(*) FROM 
 		tblhistoryofstock h
 		JOIN tblitem i ON h.ItCode = i.ItCode
-		WHERE i.ItName LIKE ?
-		OR h.BatchNo LIKE ?
+		WHERE (i.ItName LIKE ?
+		AND h.BatchNo LIKE ? AND h.source LIKE ?) AND h.CancelInd = 'N';
 	`
-	args = append(args, searchItem, searchBatch)
+	args = append(args, searchItem, searchBatch, searchSource)
 
 	if err := t.DB.GetContext(ctx, &totalRecords, countQuery, args...); err != nil {
 		return nil, fmt.Errorf("error counting records: %w", err)
@@ -60,8 +61,8 @@ func (t *TblHistoryOfStockRepository) Fetch(ctx context.Context, item, batch str
 			h.Source
 		FROM tblhistoryofstock h
 		JOIN tblitem i ON h.ItCode = i.ItCode
-		WHERE i.ItName LIKE ?
-		OR h.BatchNo LIKE ?
+		WHERE (i.ItName LIKE ?
+		AND h.BatchNo LIKE ? AND h.Source LIKE ?) AND h.CancelInd = 'N'
 	`
 
 	query += " LIMIT ? OFFSET ?"

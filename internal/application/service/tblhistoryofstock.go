@@ -8,13 +8,13 @@ import (
 )
 
 type TblHistoryOfStockService interface {
-	Fetch(ctx context.Context, item, batch string, param *pagination.PaginationParam) (*pagination.PaginationResponse, error)
+	Fetch(ctx context.Context, item, batch, source string, param *pagination.PaginationParam) (*pagination.PaginationResponse, error)
 }
 
 type TblHistoryOfStock struct {
 	TemplateRepo tblhistoryofstock.Repository `inject:"tblHistoryOfStockRepository"`
 }
 
-func (s *TblHistoryOfStock) Fetch(ctx context.Context, item, batch string, param *pagination.PaginationParam) (*pagination.PaginationResponse, error) {
-	return s.TemplateRepo.Fetch(ctx, item, batch, param)
+func (s *TblHistoryOfStock) Fetch(ctx context.Context, item, batch, source string, param *pagination.PaginationParam) (*pagination.PaginationResponse, error) {
+	return s.TemplateRepo.Fetch(ctx, item, batch, source, param)
 }

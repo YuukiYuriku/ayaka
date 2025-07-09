@@ -27,6 +27,7 @@ func (h *TblHistoryOfStockHandler) Fetch(c *fiber.Ctx) error {
 	pageSizeStr := c.Query("page_size", "")
 	item := c.Query("item")
 	batch := c.Query("batch")
+	source := c.Query("source")
 	user := c.Locals("user").(*jwt.Claims)
 
 	param := &pagination.PaginationParam{}
@@ -59,7 +60,7 @@ func (h *TblHistoryOfStockHandler) Fetch(c *fiber.Ctx) error {
 		param = nil
 	}
 
-	result, err := h.Service.Fetch(c.Context(), item, batch, param)
+	result, err := h.Service.Fetch(c.Context(), item, batch, source, param)
 
 	if err != nil {
 		go h.Log.LogUserInfo(user.UserCode, "ERROR", fmt.Sprintf("Internal server error fetch history of stock: %s", err.Error()))
