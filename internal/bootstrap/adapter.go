@@ -69,6 +69,9 @@ func RegisterRepository() {
 	appContainer.RegisterService("tblVendorSectorRepository", new(sqlx.TblVendorSectorRepository))
 	appContainer.RegisterService("tblVendorRepository", new(sqlx.TblVendorRepository))
 	appContainer.RegisterService("tblHistoryOfStockRepository", new(sqlx.TblHistoryOfStockRepository))
+	appContainer.RegisterService("tblDailyStockMovementRepository", new(sqlx.TblDailyStockMovementRepository))
+	appContainer.RegisterService("tblDirectPurchaseRcvRepository", new(sqlx.TblDirectPurchaseRcvRepository))
+	appContainer.RegisterService("tblDirectSalesDeliveryRepository", new(sqlx.TblDirectSalesDeliveryRepository))
 }
 
 func RegisterHandler() {
