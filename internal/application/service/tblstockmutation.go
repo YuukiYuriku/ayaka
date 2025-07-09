@@ -13,6 +13,7 @@ import (
 	// share "gitlab.com/ayaka/internal/domain/shared"
 
 	// "gitlab.com/ayaka/internal/domain/shared/booldatatype"
+	"gitlab.com/ayaka/internal/domain/shared/booldatatype"
 	"gitlab.com/ayaka/internal/domain/shared/formatid"
 	"gitlab.com/ayaka/internal/domain/tblstockmutationhdr"
 
@@ -25,6 +26,7 @@ type TblStockMutationService interface {
 	Fetch(ctx context.Context, doc, warehouse, batch string, param *pagination.PaginationParam) (*pagination.PaginationResponse, error)
 	Detail(ctx context.Context, docNo string) (*tblstockmutationhdr.Detail, error)
 	Create(ctx context.Context, data *tblstockmutationhdr.Create, userName string) (*tblstockmutationhdr.Create, error)
+	Update(ctx context.Context, data *tblstockmutationhdr.Detail, userCode string) (*tblstockmutationhdr.Detail, error)
 }
 
 type TblStockMutation struct {
@@ -60,18 +62,16 @@ func (s *TblStockMutation) Create(ctx context.Context, data *tblstockmutationhdr
 	data.DocDate = t.Format("20060102")
 	data.BatchNo = data.DocDate
 
-	total, err := s.ID.GetLastDetailNumber(ctx, "StockMutationDtl")
-	if err != nil {
-		return nil, err
-	}
+	count := 0
 
 	for i := 0; i < len(data.FromArray); i++ {
+		count++
+
 		if data.FromArray[i].Stock < data.FromArray[i].Qty {
 			return nil, customerrors.ErrInvalidQuantity
 		}
-		total++
 
-		data.FromArray[i].DNo = fmt.Sprintf("%03d", total)
+		data.FromArray[i].DNo = fmt.Sprintf("%03d", count)
 
 		if data.FromArray[i].BatchNo == "" {
 			data.FromArray[i].BatchNo = data.DocDate
@@ -80,17 +80,30 @@ func (s *TblStockMutation) Create(ctx context.Context, data *tblstockmutationhdr
 	}
 
 	for i := 0; i < len(data.ToArray); i++ {
-		total++
+		count++
 
-		data.ToArray[i].DNo = fmt.Sprintf("%03d", total)
+		data.ToArray[i].DNo = fmt.Sprintf("%03d", count)
 
 		data.ToArray[i].Stock = 0
 
 		if data.ToArray[i].BatchNo == "" {
 			data.ToArray[i].BatchNo = data.DocDate
 		}
-		data.ToArray[i].Source = fmt.Sprintf("%s*%s*%s", data.DocDate[3:4], data.DocNo, data.ToArray[i].DNo)
+		data.ToArray[i].Source = fmt.Sprintf("%s*%s*%s", data.DocDate[6:8], data.DocNo, data.ToArray[i].DNo)
 	}
 
 	return s.TemplateRepo.Create(ctx, data)
+}
+
+func (s *TblStockMutation) Update(ctx context.Context, data *tblstockmutationhdr.Detail, userCode string) (*tblstockmutationhdr.Detail, error) {
+	lastUpDt := time.Now().Format("200601021504")
+	data.Cancel = booldatatype.FromBool(data.Cancel.ToBool())
+
+	res, err := s.TemplateRepo.Update(ctx, userCode, lastUpDt, data)
+	if err != nil {
+		golog.Error(ctx, "Error update initial stock: "+err.Error(), err)
+		return nil, err
+	}
+
+	return res, nil
 }
