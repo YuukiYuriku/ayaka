@@ -67,18 +67,12 @@ func (s *TblInitStock) Create(ctx context.Context, data *tblinitialstock.Create,
 	}
 	data.Date = t.Format("20060102")
 
-	total, err := s.ID.GetLastDetailNumber(ctx, "StockInitialDtl")
-	if err != nil {
-		return nil, err
-	}
-
 	data.DocType = "Initial Stock"
 
 	for i := 0; i < len(data.Detail); i++ {
-		total++
 		data.Detail[i].Cancel = booldatatype.FromBool(false)
 
-		data.Detail[i].DNo = fmt.Sprintf("%03d", total)
+		data.Detail[i].DNo = fmt.Sprintf("%03d", i+1)
 
 		if data.Detail[i].Batch == "" {
 			data.Detail[i].Batch = data.Date

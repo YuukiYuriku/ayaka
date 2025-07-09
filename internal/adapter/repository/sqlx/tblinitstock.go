@@ -156,8 +156,9 @@ func (t *TblInitStockRepository) Fetch(ctx context.Context, doc, warehouse, star
 	for _, h := range data {
 		h.Details = detailMap[h.DocNo]
 		var count float32 = 0.0
-		for _, data := range detailMap[h.DocNo] {
-			count += float32(data.Quantity)
+		for i := range detailMap[h.DocNo] {
+			detailMap[h.DocNo][i].Disabled = detailMap[h.DocNo][i].Cancel.ToBool()
+			count += float32(detailMap[h.DocNo][i].Quantity)
 		}
 		h.TotalQuantity = count
 	}
@@ -381,10 +382,10 @@ func (t *TblInitStockRepository) Create(ctx context.Context, data *tblinitialsto
 				detail.ItemCode,
 				detail.Batch,
 				detail.Quantity,
-				detail.Quantity,
-				detail.Quantity,
+				0,
+				0,
 				data.CreateBy,
-				data.CreateDate,
+				data.Date,
 			)
 
 			// stock movement
@@ -400,11 +401,11 @@ func (t *TblInitStockRepository) Create(ctx context.Context, data *tblinitialsto
 				detail.ItemCode,
 				detail.Batch,
 				detail.Quantity,
-				detail.Quantity,
-				detail.Quantity,
+				0,
+				0,
 				data.Remark,
 				data.CreateBy,
-				data.CreateDate,
+				data.Date,
 			)
 
 			// history of stock
@@ -415,7 +416,7 @@ func (t *TblInitStockRepository) Create(ctx context.Context, data *tblinitialsto
 				detail.Source,
 				"N",
 				data.CreateBy,
-				data.CreateDate,
+				data.Date,
 			)
 		}
 
@@ -427,10 +428,7 @@ func (t *TblInitStockRepository) Create(ctx context.Context, data *tblinitialsto
 		}
 
 		// insert stock summary
-		queryStockSummary += strings.Join(placeholdersStockSummary, ",") + `
-			ON DUPLICATE KEY UPDATE
-				Qty = Qty + VALUES(Qty);
-		`
+		queryStockSummary += strings.Join(placeholdersStockSummary, ",") + `;`
 		if _, err = tx.ExecContext(ctx, queryStockSummary, argsStockSummary...); err != nil {
 			log.Printf("Error insert stock summary: %+v", err)
 			return nil, fmt.Errorf("error Insert Stock Summary: %w", err)
@@ -465,7 +463,7 @@ func (t *TblInitStockRepository) Update(ctx context.Context, lastUpby, lastUpDat
 	var rowsAffectedDtl int64
 
 	var placeholders, placeholdersStockSummary, placeholdersEdit, inTuples []string
-	var args, argsStockSummary, argsEdit, argsIn []interface{}
+	var args, argsStockSummary, argsEdit, argsIn, argsInSum []interface{}
 
 	var err error
 
@@ -497,15 +495,16 @@ func (t *TblInitStockRepository) Update(ctx context.Context, lastUpby, lastUpDat
 		args = append(args, data.DocNo, detail.DNo, detail.Cancel)
 
 		// min qty
-		placeholdersStockSummary = append(placeholdersStockSummary, ` WHEN WhsCode = ? AND ItCode = ? THEN (Qty - ?) `)
-		argsStockSummary = append(argsStockSummary, data.WarehouseCode, detail.ItemCode, detail.Quantity)
+		placeholdersStockSummary = append(placeholdersStockSummary, ` WHEN WhsCode = ? AND Source = ? AND ItCode = ? THEN (Qty - ?) `)
+		argsStockSummary = append(argsStockSummary, data.WarehouseCode, detail.Source, detail.ItemCode, detail.Quantity)
 
 		// edit cancel status on history of stock and stock movement
-		placeholdersEdit = append(placeholdersEdit, ` WHEN  ItCode = ? AND Source = ? AND BatchNo = ? THEN CancelInd = ? `)
+		placeholdersEdit = append(placeholdersEdit, ` WHEN  ItCode = ? AND Source = ? AND BatchNo = ? THEN ? `)
 		argsEdit = append(argsEdit, detail.ItemCode, detail.Source, detail.Batch, detail.Cancel)
 		
 		inTuples = append(inTuples, "(?, ?, ?)")
 		argsIn = append(argsIn, detail.ItemCode, detail.Source, detail.Batch)
+		argsInSum = append(argsInSum, data.WarehouseCode, detail.Source, detail.ItemCode)
 	}
 
 	query := `UPDATE tblstockinitialdtl
@@ -538,9 +537,9 @@ func (t *TblInitStockRepository) Update(ctx context.Context, lastUpby, lastUpDat
 			` + strings.Join(placeholdersStockSummary, " ") + `
 			ELSE Qty
 		END
-		WHERE WhsCode = ?;
+		WHERE (WhsCode, Source, ItCode) IN (` + strings.Join(inTuples, ",") + `)
 	`
-	argsStockSummary = append(argsStockSummary, data.WarehouseCode)
+	argsStockSummary = append(argsStockSummary, argsInSum...)
 
 	if _, err := tx.ExecContext(ctx, query, argsStockSummary...); err != nil {
 		log.Printf("Failed to update stock summary: %+v", err)
@@ -555,7 +554,10 @@ func (t *TblInitStockRepository) Update(ctx context.Context, lastUpby, lastUpDat
 		END
 		WHERE (ItCode, Source, BatchNo) IN (` + strings.Join(inTuples, ",") + `)
 	`
+
+	fmt.Println("Query history of stock: ", query)
 	argsEdit = append(argsEdit, argsIn...)
+	fmt.Println("args history of stock: ", argsEdit)
 	if _, err := tx.ExecContext(ctx, query, argsEdit...); err != nil {
 		log.Printf("Failed to update history of stock: %+v", err)
 		return nil, fmt.Errorf("error updating history of stock: %w", err)
@@ -569,6 +571,8 @@ func (t *TblInitStockRepository) Update(ctx context.Context, lastUpby, lastUpDat
 		END
 		WHERE (ItCode, Source, BatchNo) IN (` + strings.Join(inTuples, ",") + `)
 	`
+	fmt.Println("Query stock sum: ", query)
+	fmt.Println("args stock sum: ", argsEdit)
 	if _, err := tx.ExecContext(ctx, query, argsEdit...); err != nil {
 		log.Printf("Failed to update stock movement: %+v", err)
 		return nil, fmt.Errorf("error updating stock movement: %w", err)

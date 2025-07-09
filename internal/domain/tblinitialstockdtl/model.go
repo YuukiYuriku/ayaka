@@ -17,6 +17,7 @@ type Read struct {
 	Uom       string                    `db:"UomName" json:"uom,omitempty"`
 	Price     float32                   `db:"UPrice" json:"price,omitempty"`
 	Source    string                    `db:"Source" json:"source"`
+	Disabled bool `json:"disabled"`
 }
 
 type Create struct {

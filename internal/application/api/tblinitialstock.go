@@ -170,6 +170,10 @@ func (h *TblInitStockHandler) Update(c *fiber.Ctx) error {
 			go h.Log.LogUserInfo(user.UserCode, "INFO", fmt.Sprintf("Update data initial stock %s", req.DocNo))
 			return c.Status(fiber.StatusOK).JSON(formatter.NewSuccessResponse(formatter.Success, result))
 		}
+		if errors.Is(err, customerrors.ErrInvalidInput) {
+			go h.Log.LogUserInfo(user.UserCode, "INFO", fmt.Sprintf("Update data initial stock %s", req.DocNo))
+			return c.Status(fiber.StatusOK).JSON(formatter.NewSuccessResponse(formatter.Success, result))
+		}
 		go h.Log.LogUserInfo(user.UserCode, "ERROR", fmt.Sprintf("Internal server error update initial stock: %s", err.Error()))
 		return err
 	}
