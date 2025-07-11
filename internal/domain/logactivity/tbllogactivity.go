@@ -35,6 +35,9 @@ var listTable = map[string]string{
 	"MasterVendor":          "tblvendorhdr",
 	"DirectPurchaseReceive": "tbldirectpurchasercvhdr",
 	"DirectSalesDelivery":   "tbldirectsalesdelivhdr",
+	"MaterialTransfer":      "tblmaterialtransferhdr",
+	"MaterialReceive":       "tblmaterialreceivehdr",
+	"DirectMaterialReceive": "tbldirectmaterialreceivehdr",
 }
 
 var listCode = map[string]string{
@@ -55,15 +58,18 @@ var listCode = map[string]string{
 	"StockMutationDtl":      "DNo",
 	"DirectPurchaseReceive": "DocNo",
 	// "DirectPurchaseReceiveDtl": "DNo",
-	"TaxGroup":            "TaxGroupCode",
-	"Tax":                 "TaxCode",
-	"CustomerCategory":    "CustCatCode",
-	"Site":                "SiteCode",
-	"VendorCategory":      "VendorCatCode",
-	"VendorRating":        "IndicatorCode",
-	"VendorSector":        "SectorCode",
-	"MasterVendor":        "VendorCode",
-	"DirectSalesDelivery": "DocNo",
+	"TaxGroup":              "TaxGroupCode",
+	"Tax":                   "TaxCode",
+	"CustomerCategory":      "CustCatCode",
+	"Site":                  "SiteCode",
+	"VendorCategory":        "VendorCatCode",
+	"VendorRating":          "IndicatorCode",
+	"VendorSector":          "SectorCode",
+	"MasterVendor":          "VendorCode",
+	"DirectSalesDelivery":   "DocNo",
+	"MaterialTransfer":      "DocNo",
+	"MaterialReceive":       "DocNo",
+	"DirectMaterialReceive": "DocNo",
 }
 
 var listDoc = map[string]string{
@@ -72,6 +78,9 @@ var listDoc = map[string]string{
 	"StockMutation":         "SM",
 	"DirectPurchaseReceive": "DPRV",
 	"DirectSalesDelivery":   "DSDV",
+	"MaterialTransfer":      "MTF",
+	"MaterialReceive":       "MRV",
+	"DirectMaterialReceive": "DMRV",
 }
 
 func TableOf(category string) (string, error) {
