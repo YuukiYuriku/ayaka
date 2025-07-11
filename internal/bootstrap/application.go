@@ -37,6 +37,10 @@ func RegisterService() {
 	appContainer.RegisterService("tblDailyStockMovementService", new(service.TblDailyStockMovement))
 	appContainer.RegisterService("tblDirectPurchaseRcvService", new(service.TblDirectPurchaseRcv))
 	appContainer.RegisterService("tblDirectSalesDeliveryService", new(service.TblDirectSalesDelivery))
+	appContainer.RegisterService("tblMaterialTransferService", new(service.TblMaterialTransfer))
+	appContainer.RegisterService("tblMaterialReceiveService", new(service.TblMaterialReceive))
+	appContainer.RegisterService("tblTransferItemBetweenWhsService", new(service.TblTransferItemBetweenWhs))
+	appContainer.RegisterService("tblDirectMaterialReceiveService", new(service.TblDirectMaterialReceive))
 }
 
 func RegisterApi() {
@@ -73,6 +77,10 @@ func RegisterApi() {
 	appContainer.RegisterService("tblDailyStockMovementHandler", new(api.TblDailyStockMovementHandler))
 	appContainer.RegisterService("tblDirectPurchaseRcvHandler", new(api.TblDirectPurchaseRcvHandler))
 	appContainer.RegisterService("tblDirectSalesDeliveryHandler", new(api.TblDirectSalesDeliveryHandler))
+	appContainer.RegisterService("tblMaterialTransferHandler", new(api.TblMaterialTransferHandler))
+	appContainer.RegisterService("tblMaterialReceiveHandler", new(api.TblMaterialReceiveHandler))
+	appContainer.RegisterService("tblTransferItemBetweenWhsHandler", new(api.TblTransferItemBetweenWhsHandler))
+	appContainer.RegisterService("tblDirectMaterialReceiveHandler", new(api.TblDirectMaterialReceiveHandler))
 
 	appContainer.RegisterService("api", new(application.Api))
 
