@@ -37,7 +37,8 @@ func (t *TblStockMutationRepository) Fetch(ctx context.Context, doc, warehouse, 
 			SELECT
 				COUNT(d.DNo)
 			FROM tblstockmutationhdr h
-			JOIN tblstockmutationdtl d `
+			JOIN tblstockmutationdtl d ON h.DocNo = d.DocNo
+		`
 	// endQuery = append(endQuery, ` h.DocDt BETWEEN ? AND ?  `)
 	// args = append(args, startDate, endDate)
 
