@@ -41,6 +41,14 @@ func RegisterService() {
 	appContainer.RegisterService("tblMaterialReceiveService", new(service.TblMaterialReceive))
 	appContainer.RegisterService("tblTransferItemBetweenWhsService", new(service.TblTransferItemBetweenWhs))
 	appContainer.RegisterService("tblDirectMaterialReceiveService", new(service.TblDirectMaterialReceive))
+	appContainer.RegisterService("tblMaterialRequestService", new(service.TblMaterialRequest))
+	appContainer.RegisterService("tblVendorQuotationService", new(service.TblVendorQuotation))
+	appContainer.RegisterService("tblPurchaseOrderRequestService", new(service.TblPurchaseOrderRequest))
+	appContainer.RegisterService("tblPurchaseOrderService", new(service.TblPurchaseOrder))
+	appContainer.RegisterService("tblPurchaseMaterialReceiveService", new(service.TblPurchaseMaterialReceive))
+	appContainer.RegisterService("tblPurchaseReturnDeliveryService", new(service.TblPurchaseReturnDelivery))
+	appContainer.RegisterService("tblOrderReportService", new(service.TblOrderReport))
+	appContainer.RegisterService("DashboardService", new(service.Dashboard))
 }
 
 func RegisterApi() {
@@ -81,7 +89,14 @@ func RegisterApi() {
 	appContainer.RegisterService("tblMaterialReceiveHandler", new(api.TblMaterialReceiveHandler))
 	appContainer.RegisterService("tblTransferItemBetweenWhsHandler", new(api.TblTransferItemBetweenWhsHandler))
 	appContainer.RegisterService("tblDirectMaterialReceiveHandler", new(api.TblDirectMaterialReceiveHandler))
+	appContainer.RegisterService("tblMaterialRequestHandler", new(api.TblMaterialRequestHandler))
+	appContainer.RegisterService("tblVendorQuotationHandler", new(api.TblVendorQuotationHandler))
+	appContainer.RegisterService("tblPurchaseOrderRequestHandler", new(api.TblPurchaseOrderRequestHandler))
+	appContainer.RegisterService("tblPurchaseOrderHandler", new(api.TblPurchaseOrderHandler))
+	appContainer.RegisterService("tblPurchaseMaterialReceiveHandler", new(api.TblPurchaseMaterialReceiveHandler))
+	appContainer.RegisterService("tblPurchaseReturnDeliveryHandler", new(api.TblPurchaseReturnDeliveryHandler))
+	appContainer.RegisterService("tblOrderReportHandler", new(api.TblOrderReportHandler))
+	appContainer.RegisterService("DashboardHandler", new(api.DashboardHandler))
 
 	appContainer.RegisterService("api", new(application.Api))
-
 }

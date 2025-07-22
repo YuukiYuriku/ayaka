@@ -13,3 +13,16 @@ type GetMaterial struct {
 	Uom          string                    `db:"UomName" json:"uom_name"`
 	Remark       nulldatatype.NullDataType `db:"Remark" json:"remark"`
 }
+
+type Read struct {
+	Number  uint                      `json:"number"`
+	DocNo   string                    `db:"DocNo" json:"document_number"`
+	Date    string                    `db:"DocDt" json:"date"`
+	WhsFrom string                    `db:"WhsFrom" json:"warehouse_from"`
+	WhsTo   string                    `db:"WhsTo" json:"warehouse_to"`
+	ItName  string                    `db:"ItName" json:"item_name"`
+	BatchNo string                    `db:"BatchNo" json:"batch"`
+	Qty     float32                   `db:"Qty" json:"quantity"`
+	UomName string                    `db:"UomName" json:"uom_name"`
+	Remark  nulldatatype.NullDataType `db:"Remark" json:"remark"`
+}

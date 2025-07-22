@@ -62,10 +62,20 @@ func FormatToCompactDateTime(input string) (string, error) {
 	return parsedTime.Format("20060102"), nil
 }
 
-func ToDatePicker(input string) (string) {
+// format date from yyyymmdd to yyyy-mm-dd
+func ToDatePicker(input string) string {
 	parsedTime, err := time.Parse("20060102", input)
 	if err != nil {
 		return ""
 	}
 	return parsedTime.Format("2006-01-02")
+}
+
+// format date from yyyymmdd to yyyy-mm-dd
+func MonthYear(input string) string {
+	parsedTime, err := time.Parse("2006-01-02T15:04:05.000Z", input)
+	if err != nil {
+		return ""
+	}
+	return parsedTime.Format("200601")
 }

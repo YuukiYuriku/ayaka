@@ -11,4 +11,5 @@ type Repository interface {
 	Fetch(ctx context.Context, name, cat string, param *pagination.PaginationParam) (*pagination.PaginationResponse, error)
 	Detail(ctx context.Context, vendorCode string) (*Detail, error)
 	Update(ctx context.Context, data *Update) (*Update, error)
+	GetContact(ctx context.Context, code string, param *pagination.PaginationParam) (*pagination.PaginationResponse, error)
 }

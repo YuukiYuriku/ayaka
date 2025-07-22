@@ -826,3 +826,71 @@ func (t *TblVendorRepository) Update(ctx context.Context, data *tblmastervendor.
 
 	return data, nil
 }
+
+func (t *TblVendorRepository) GetContact(ctx context.Context, code string, param *pagination.PaginationParam) (*pagination.PaginationResponse, error) {
+	var totalRecords int
+	var args []interface{}
+
+	search :=  code
+	countQuery := "SELECT COUNT(*) FROM tblcontactvendordtl WHERE VendorCode = ? AND Active = 'Y'"
+	args = append(args, search)
+
+	if err := t.DB.GetContext(ctx, &totalRecords, countQuery, args...); err != nil {
+		return nil, fmt.Errorf("error counting records: %w", err)
+	}
+
+	var totalPages int
+	var offset int
+
+	if param != nil {
+		totalPages, offset = pagination.CountPagination(param, totalRecords)
+
+		log.Printf("Calculated values - Total Records: %d, Total Pages: %d, Offset: %d",
+			totalRecords, totalPages, offset)
+	} else {
+		param = &pagination.PaginationParam{
+			PageSize: totalRecords,
+			Page:     1,
+		}
+		totalPages = 1
+		offset = 0
+	}
+
+	var items []*tblmastervendor.ContactVendorDetailPO
+	query := `SELECT
+			DNo,
+			Name
+		FROM tblcontactvendordtl WHERE Active = 'Y' AND VendorCode = ?`
+
+	query += " LIMIT ? OFFSET ?"
+	args = append(args, param.PageSize, offset)
+
+	if err := t.DB.SelectContext(ctx, &items, query, args...); err != nil {
+		fmt.Println("error: ", err)
+		if errors.Is(err, sql.ErrNoRows) {
+			return &pagination.PaginationResponse{
+				Data:         make([]*tblmastervendor.ContactVendorDetail, 0),
+				TotalRecords: 0,
+				TotalPages:   0,
+				CurrentPage:  param.Page,
+				PageSize:     param.PageSize,
+				HasNext:      false,
+				HasPrevious:  false,
+			}, nil
+		}
+		return nil, fmt.Errorf("error Fetch Vendor Sector: %w", err)
+	}
+
+	// response
+	response := &pagination.PaginationResponse{
+		Data:         items,
+		TotalRecords: totalRecords,
+		TotalPages:   totalPages,
+		CurrentPage:  param.Page,
+		PageSize:     param.PageSize,
+		HasNext:      param.Page < totalPages,
+		HasPrevious:  param.Page > 1,
+	}
+
+	return response, nil
+}

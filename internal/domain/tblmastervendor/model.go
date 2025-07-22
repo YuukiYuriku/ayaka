@@ -7,12 +7,21 @@ import (
 
 // Read & Detail
 type ContactVendorDetail struct {
-	VendorCode string                    `db:"VendorCode" json:"vendor_code"`
+	VendorCode string                    `db:"VendorCode" json:"vendor_code,omitempty"`
 	DNo        string                    `db:"DNo" json:"detail_no"`
 	Name       string                    `db:"Name" json:"name"`
-	Number     string                    `db:"Number" json:"number"`
-	Position   nulldatatype.NullDataType `db:"Position" json:"position"`
-	Type       nulldatatype.NullDataType `db:"Type" json:"type"`
+	Number     string                    `db:"Number" json:"number,omitempty"`
+	Position   nulldatatype.NullDataType `db:"Position" json:"position,omitempty"`
+	Type       nulldatatype.NullDataType `db:"Type" json:"type,omitempty"`
+}
+
+type ContactVendorDetailPO struct {
+	VendorCode string                    `db:"VendorCode" json:"vendor_code,omitempty"`
+	DNo        string                    `db:"DNo" json:"detail_number_contact_vendor"`
+	Name       string                    `db:"Name" json:"name"`
+	Number     string                    `db:"Number" json:"number,omitempty"`
+	Position   nulldatatype.NullDataType `db:"Position" json:"position,omitempty"`
+	Type       nulldatatype.NullDataType `db:"Type" json:"type,omitempty"`
 }
 
 type ItemCategoryVendorDetail struct {
@@ -36,7 +45,7 @@ type Read struct {
 	Number     uint   `json:"number"`
 	VendorCode string `db:"VendorCode" json:"vendor_code"`
 	VendorName string `db:"VendorName" json:"vendor_name"`
-	Address    string `db:"Address" json:"address"`
+	Address    nulldatatype.NullDataType `db:"Address" json:"address"`
 	CityName   string `db:"CityName" json:"city_name"`
 	CreateDate string `db:"CreateDt" json:"create_date"`
 }

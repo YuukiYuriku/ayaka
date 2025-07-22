@@ -58,7 +58,7 @@ func (t *TblStockMutationRepository) Fetch(ctx context.Context, doc, warehouse, 
 	}
 
 	if len(endQuery) > 0 {
-		countQuery += " WHERE " + strings.Join(endQuery, " AND ")
+		countQuery += " WHERE " + strings.Join(endQuery, " OR ")
 	}
 
 	if err := t.DB.GetContext(ctx, &totalRecords, countQuery, args...); err != nil {
@@ -101,7 +101,7 @@ func (t *TblStockMutationRepository) Fetch(ctx context.Context, doc, warehouse, 
 		JOIN tbluom u ON i.PurchaseUOMCode = u.UomCode`
 
 	if len(endQuery) > 0 {
-		query += " WHERE " + strings.Join(endQuery, " AND ")
+		query += " WHERE " + strings.Join(endQuery, " OR ")
 	}
 	query += ` LIMIT ? OFFSET ? `
 	args = append(args, param.PageSize, offset)

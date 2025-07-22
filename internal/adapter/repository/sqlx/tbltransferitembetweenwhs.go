@@ -106,7 +106,7 @@ func (t *TblTransferItemBetweenWhsRepository) GetMaterial(ctx context.Context, i
 		LEFT JOIN tblmaterialreceivedtl r 
 			ON r.DocNoMaterialTransfer = t.DocNo
 			AND r.ItCode = t.ItCode
-			AND (r.BatchNo = t.BatchNo OR (r.BatchNo IS NULL AND t.BatchNo IS NULL)) -- handle batch null
+			AND (r.BatchNo = t.BatchNo OR (r.BatchNo IS NULL AND t.BatchNo IS NULL))
 		WHERE h.WhsCodeFrom = ? AND h.WhsCodeTo = ? AND t.CancelInd = 'N'
  	`
 
@@ -159,6 +159,120 @@ func (t *TblTransferItemBetweenWhsRepository) GetMaterial(ctx context.Context, i
 	// response
 	response := &pagination.PaginationResponse{
 		Data:         filtered,
+		TotalRecords: totalRecords,
+		TotalPages:   totalPages,
+		CurrentPage:  param.Page,
+		PageSize:     param.PageSize,
+		HasNext:      param.Page < totalPages,
+		HasPrevious:  param.Page > 1,
+	}
+
+	return response, nil
+}
+
+func (t *TblTransferItemBetweenWhsRepository) Fetch(ctx context.Context, item, warehouseFrom, warehouseTo, startDate, endDate string, param *pagination.PaginationParam) (*pagination.PaginationResponse, error) {
+	var totalRecords int
+
+	searchItem := "%" + item + "%"
+	var args []interface{}
+
+	countQuery := `SELECT COUNT(*) FROM tbltransferbetweenwhs t
+		JOIN tblitem i ON t.ItCode = i.ItCode
+		WHERE i.ItName LIKE ? AND t.CancelInd = 'N'
+	`
+	var endQuery string
+	args = append(args, searchItem)
+
+	if warehouseFrom != "" {
+		endQuery += " AND t.WhsFrom = ? "
+		args = append(args, warehouseFrom)
+	}
+
+	if warehouseTo != "" {
+		endQuery += " AND t.WhsTo = ? "
+		args = append(args, warehouseTo)
+	}
+
+	if startDate != "" && endDate != "" {
+		endQuery += " AND DocDt BETWEEN ? AND ?"
+		args = append(args, startDate, endDate)
+	}
+
+	countQuery += endQuery
+	if err := t.DB.GetContext(ctx, &totalRecords, countQuery, args...); err != nil {
+		return nil, fmt.Errorf("error counting records: %w", err)
+	}
+
+	var totalPages int
+	var offset int
+
+	if param != nil {
+		totalPages, offset = pagination.CountPagination(param, totalRecords)
+
+		log.Printf("Calculated values - Total Records: %d, Total Pages: %d, Offset: %d",
+			totalRecords, totalPages, offset)
+	} else {
+		param = &pagination.PaginationParam{
+			PageSize: totalRecords,
+			Page:     1,
+		}
+		totalPages = 1
+		offset = 0
+	}
+
+	var data []*tbltransferbetweenwhs.Read
+
+	query := `SELECT
+			t.DocNo,
+			t.DocDt,
+			wf.WhsName AS WhsFrom,
+			wt.WhsName AS WhsTo,
+			i.ItName,
+			t.BatchNo,
+			t.Qty,
+			u.UomName,
+			t.Remark
+		FROM tbltransferbetweenwhs t
+		JOIN tblwarehouse wf
+			ON t.WhsFrom = wf.WhsCode
+		JOIN tblwarehouse wt
+			ON t.WhsTo = wt.WhsCode
+		JOIN tblitem i
+			ON t.ItCode = i.ItCode
+		JOIN tbluom u
+			ON i.PurchaseUOMCode = u.UomCode
+		WHERE i.ItName LIKE ?
+	`
+	endQuery += ` LIMIT ? OFFSET ? `
+	args = append(args, param.PageSize, offset)
+
+	query += endQuery
+	if err := t.DB.SelectContext(ctx, &data, query, args...); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return &pagination.PaginationResponse{
+				Data:         make([]*tbltransferbetweenwhs.Read, 0),
+				TotalRecords: 0,
+				TotalPages:   0,
+				CurrentPage:  param.Page,
+				PageSize:     param.PageSize,
+				HasNext:      false,
+				HasPrevious:  false,
+			}, nil
+		}
+		return nil, fmt.Errorf("error Fetch material transfer: %w", err)
+	}
+
+	// proses data
+	j := offset
+	for _, detail := range data {
+		j++
+		detail.Number = uint(j)
+		detail.Date = share.FormatDate(detail.Date)
+	}
+
+	// response
+	response := &pagination.PaginationResponse{
+		Data:         data,
 		TotalRecords: totalRecords,
 		TotalPages:   totalPages,
 		CurrentPage:  param.Page,

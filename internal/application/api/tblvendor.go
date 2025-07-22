@@ -22,6 +22,7 @@ type TblVendorApi interface {
 	Detail(c *fiber.Ctx) error
 	Create(c *fiber.Ctx) error
 	Update(c *fiber.Ctx) error
+	GetContact(c *fiber.Ctx) error
 }
 
 type TblVendorHandler struct {
@@ -148,6 +149,54 @@ func (h *TblVendorHandler) Update(c *fiber.Ctx) error {
 	}
 
 	go h.Log.LogUserInfo(user.UserCode, "INFO", fmt.Sprintf("Update data vendor %s", req.VendorCode))
+
+	return c.Status(fiber.StatusOK).JSON(formatter.NewSuccessResponse(formatter.Success, result))
+}
+
+func (h *TblVendorHandler) GetContact(c *fiber.Ctx) error {
+	pageStr := c.Query("page", "")
+	pageSizeStr := c.Query("page_size", "")
+	search := c.Query("search")
+	user := c.Locals("user").(*jwt.Claims)
+
+	param := &pagination.PaginationParam{}
+	if pageStr != "" && pageSizeStr != "" {
+		page, err := strconv.Atoi(pageStr)
+		if err != nil {
+			go h.Log.LogUserInfo(user.UserCode, "WARN", "Invalid page input vendor")
+			return c.Status(fiber.StatusBadRequest).JSON(formatter.NewErrorResponse(formatter.InvalidRequest, "Invalid Page", ""))
+		}
+
+		pageSize, err := strconv.Atoi(pageSizeStr)
+		if err != nil {
+			go h.Log.LogUserInfo(user.UserCode, "WARN", "Invalid page size input vendor")
+			return c.Status(fiber.StatusBadRequest).JSON(formatter.NewErrorResponse(formatter.InvalidRequest, "Invalid Page Size", ""))
+		}
+
+		// Validasi nilai
+		if page < 1 {
+			page = 1
+		}
+		if pageSize < 1 {
+			pageSize = 10
+		}
+
+		param = &pagination.PaginationParam{
+			Page:     page,
+			PageSize: pageSize,
+		}
+	} else {
+		param = nil
+	}
+
+	result, err := h.Service.GetContact(c.Context(), search, param)
+
+	if err != nil {
+		go h.Log.LogUserInfo(user.UserCode, "ERROR", fmt.Sprintf("Internal server error fetch contact vendor: %s", err.Error()))
+		return c.Status(fiber.StatusInternalServerError).JSON(formatter.NewErrorResponse(formatter.InternalServerError, "Internal Server Error", ""))
+	}
+
+	go h.Log.LogUserInfo(user.UserCode, "INFO", "Fetch all contact vendor")
 
 	return c.Status(fiber.StatusOK).JSON(formatter.NewSuccessResponse(formatter.Success, result))
 }

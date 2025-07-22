@@ -17,6 +17,7 @@ import (
 type TblTransferItemBetweenWhsService interface {
 	// Fetch(ctx context.Context, warehouse, date, itemCatCode, itemCode, itemName string, param *pagination.PaginationParam) (*pagination.PaginationResponse, error)
 	GetMaterial(ctx context.Context, itemName, itemCatCode, batch, warehouse string, param *pagination.PaginationParam) (*pagination.PaginationResponse, error)
+	Fetch(ctx context.Context, itemName, warehouseFrom, warehouseTo, startDate, endDate string, param *pagination.PaginationParam) (*pagination.PaginationResponse, error)
 }
 
 type TblTransferItemBetweenWhs struct {
@@ -26,4 +27,8 @@ type TblTransferItemBetweenWhs struct {
 
 func (s *TblTransferItemBetweenWhs) GetMaterial(ctx context.Context, itemName, batch, warehouseFrom, warehouseTo string, param *pagination.PaginationParam) (*pagination.PaginationResponse, error) {
 	return s.TemplateRepo.GetMaterial(ctx, itemName, batch, warehouseFrom, warehouseTo, param)
+}
+
+func (s *TblTransferItemBetweenWhs) Fetch(ctx context.Context, itemName, warehouseFrom, warehouseTo, startDate, endDate string, param *pagination.PaginationParam) (*pagination.PaginationResponse, error) {
+	return s.TemplateRepo.Fetch(ctx, itemName, warehouseFrom, warehouseTo, startDate, endDate, param)
 }

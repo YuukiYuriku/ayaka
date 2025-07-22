@@ -314,7 +314,7 @@ func (t *TblMaterialReceiveRepository) Create(ctx context.Context, data *tblmate
 		`
 		var whensUpdate []string
 		var wheresUpdate []string
-		var argsUpdate []interface{}
+		var argsUpdate, argsInUpdate []interface{}
 
 		for _, detail := range data.Details {
 			// detail
@@ -434,23 +434,18 @@ func (t *TblMaterialReceiveRepository) Create(ctx context.Context, data *tblmate
 				data.CreateDt,
 			)
 
-			whensUpdate = append(whensUpdate, `
-				WHEN DocNo = ? AND ItCode = ? AND BatchNo = ? AND Qty <= (
-					SELECT COALESCE(SUM(QtyActual), 0)
-					FROM tblmaterialreceivedtl
-					WHERE DocNoMaterialTransfer = ? AND ItCode = ? AND BatchNo = ?
-				) THEN 'Y'
-			`)
-			argsUpdate = append(argsUpdate,
-				detail.DocNoMaterialTransfer,
-				detail.ItCode,
-				detail.BatchNo,
-				detail.DocNoMaterialTransfer,
-				detail.ItCode,
-				detail.BatchNo,
-			)
-			wheresUpdate = append(wheresUpdate, "(DocNo = ? AND ItCode = ? AND BatchNo = ?)")
-			argsUpdate = append(argsUpdate, detail.DocNoMaterialTransfer, detail.ItCode, detail.BatchNo)
+			if detail.QtyActual >= detail.QtyTransfer {
+				whensUpdate = append(whensUpdate, `
+					WHEN DocNo = ? AND ItCode = ? AND BatchNo = ? THEN 'Y'
+				`)
+				argsUpdate = append(argsUpdate,
+					detail.DocNoMaterialTransfer,
+					detail.ItCode,
+					detail.BatchNo,
+				)
+				wheresUpdate = append(wheresUpdate, "(?, ?, ?)")
+				argsInUpdate = append(argsInUpdate, detail.DocNoMaterialTransfer, detail.ItCode, detail.BatchNo)
+			}
 		}
 
 		// insert detail
@@ -488,17 +483,20 @@ func (t *TblMaterialReceiveRepository) Create(ctx context.Context, data *tblmate
 			return nil, fmt.Errorf("error Insert report transfer: %w", err)
 		}
 
-		// update detail
-		queryUpdate += strings.Join(whensUpdate, " ")
-		queryUpdate += `
-			ELSE SuccessInd
-			END
-		WHERE ` + strings.Join(wheresUpdate, " OR ")
-		fmt.Println("query: ", queryUpdate)
-		fmt.Println("args: ", argsUpdate)
-		if _, err = tx.ExecContext(ctx, queryUpdate, argsUpdate...); err != nil {
-			log.Printf("Error Update Material Transfer: %+v", err)
-			return nil, fmt.Errorf("error Update Material Transfer: %w", err)
+		if len(wheresUpdate) > 0 && len(whensUpdate) > 0 && len(argsUpdate) > 0 {
+			// update detail
+			queryUpdate += strings.Join(whensUpdate, " ")
+			queryUpdate += `
+				ELSE SuccessInd
+				END
+			WHERE (DocNo, ItCode, BatchNo) IN (` + strings.Join(wheresUpdate, ", ") + ")"
+			argsUpdate = append(argsUpdate, argsInUpdate...)
+			fmt.Println("query: ", queryUpdate)
+			fmt.Println("args: ", argsUpdate)
+			if _, err = tx.ExecContext(ctx, queryUpdate, argsUpdate...); err != nil {
+				log.Printf("Error Update Material Transfer: %+v", err)
+				return nil, fmt.Errorf("error Update Material Transfer: %w", err)
+			}
 		}
 
 		////////////////////////////////////////// CHECK HEADER

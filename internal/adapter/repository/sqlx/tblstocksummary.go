@@ -66,7 +66,8 @@ func (t *TblStockSummaryRepository) Fetch(ctx context.Context, warehouse []strin
 	}
 
 	countQuery += `
-			GROUP BY s.WhsCode, s.Source, s.ItCode
+			GROUP BY s.WhsCode, s.ItCode
+			HAVING SUM(Qty + Qty2 - Qty3) != 0
 		) AS grouped`
 
 	fmt.Println("Query count: ", countQuery)
@@ -114,6 +115,7 @@ func (t *TblStockSummaryRepository) Fetch(ctx context.Context, warehouse []strin
 	}
 
 	query += ` GROUP BY s.WhsCode, s.ItCode, w.WhsName
+		HAVING SUM(Qty + Qty2 - Qty3) != 0
 		LIMIT ? OFFSET ?`
 	search = append(search, param.PageSize, offset)
 

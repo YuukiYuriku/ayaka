@@ -34,7 +34,7 @@ type TblStockMutationHandler struct {
 func (h *TblStockMutationHandler) Fetch(c *fiber.Ctx) error {
 	pageStr := c.Query("page", "")
 	pageSizeStr := c.Query("page_size", "")
-	docNo := c.Query("document_number", "")
+	docNo := c.Query("search", "")
 	warehouse := c.Query("warehouse", "")
 	// startDate := c.Query("start_date", "")
 	// endDate := c.Query("end_date", "")

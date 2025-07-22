@@ -19,6 +19,7 @@ type TblVendorService interface {
 	Detail(ctx context.Context, vendorCode string) (*tblmastervendor.Detail, error)
 	Create(ctx context.Context, data *tblmastervendor.Create, userName string) (*tblmastervendor.Create, error)
 	Update(ctx context.Context, data *tblmastervendor.Update, userCode string) (*tblmastervendor.Update, error)
+	GetContact(ctx context.Context, code string, param *pagination.PaginationParam) (*pagination.PaginationResponse, error)
 }
 
 type TblVendor struct {
@@ -195,4 +196,8 @@ func (s *TblVendor) Update(ctx context.Context, data *tblmastervendor.Update, us
 	}
 
 	return res, nil
+}
+
+func (s *TblVendor) GetContact(ctx context.Context, code string, param *pagination.PaginationParam) (*pagination.PaginationResponse, error) {
+	return s.TemplateRepo.GetContact(ctx, code, param)
 }

@@ -76,6 +76,14 @@ func RegisterRepository() {
 	appContainer.RegisterService("tblMaterialReceiveRepository", new(sqlx.TblMaterialReceiveRepository))
 	appContainer.RegisterService("tblTransferItemBetweenWhsRepository", new(sqlx.TblTransferItemBetweenWhsRepository))
 	appContainer.RegisterService("tblDirectMaterialReceiveRepository", new(sqlx.TblDirectMaterialReceiveRepository))
+	appContainer.RegisterService("tblMaterialRequestRepository", new(sqlx.TblMaterialRequestRepository))
+	appContainer.RegisterService("tblVendorQuotationRepository", new(sqlx.TblVendorQuotationRepository))
+	appContainer.RegisterService("tblPurchaseOrderRequestRepository", new(sqlx.TblPurchaseOrderRequestRepository))
+	appContainer.RegisterService("tblPurchaseOrderRepository", new(sqlx.TblPurchaseOrderRepository))
+	appContainer.RegisterService("tblPurchaseMaterialReceiveRepository", new(sqlx.TblPurchaseMaterialReceiveRepository))
+	appContainer.RegisterService("tblPurchaseReturnDeliveryRepository", new(sqlx.TblPurchaseReturnDeliveryRepository))
+	appContainer.RegisterService("tblOrderReportRepository", new(sqlx.TblOrderReportRepository))
+	appContainer.RegisterService("DashboardRepository", new(sqlx.DashboardRepository))
 }
 
 func RegisterHandler() {

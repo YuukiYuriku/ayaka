@@ -11,3 +11,17 @@ func UniqueStringSlice(input []string) []string {
 	}
 	return result
 }
+
+func UniqueTupleSlice(pairs [][2]string) [][2]string {
+	seen := make(map[string]bool)
+	result := make([][2]string, 0)
+
+	for _, p := range pairs {
+		key := p[0] + "|" + p[1]
+		if !seen[key] {
+			result = append(result, p)
+			seen[key] = true
+		}
+	}
+	return result
+}

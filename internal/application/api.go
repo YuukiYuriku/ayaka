@@ -8,44 +8,52 @@ import (
 )
 
 type Api struct {
-	App                              *rest.Fiber                         `inject:"fiber"`
-	Config                           *config.Config                      `inject:"config"`
-	HealthCheckHandler               api.HealthCheckAPI                  `inject:"healthCheckHandler"`
-	TblUserHandler                   api.TblUserApi                      `inject:"tblUserHandler"`
-	TblCountryHandler                api.TblCountryApi                   `inject:"tblCountryHandler"`
-	TblCityHandler                   api.TblCityApi                      `inject:"tblCityHandler"`
-	TblProvinceHandler               api.TblProvinceAPI                  `inject:"tblProvinceHandler"`
-	MiddlewareHandler                *custommiddleware.MiddlewareHandler `inject:"middlewareHandler"`
-	TblUomHandler                    api.TblUomApi                       `inject:"tblUomHandler"`
-	TblCoaHandler                    api.TblCoaApi                       `inject:"tblCoaHandler"`
-	TblItemCatHandler                api.TblItemCatApi                   `inject:"tblItemCatHandler"`
-	TblWarehouseHandler              api.TblWarehouseApi                 `inject:"tblWarehouseHandler"`
-	TblWarehouseCategoryHandler      api.TblWarehouseCategoryApi         `inject:"tblWarehouseCategoryHandler"`
-	TblLogHandler                    api.TblLogApi                       `inject:"tblLogHandler"`
-	TblItemHandler                   api.TblItemApi                      `inject:"tblItemHandler"`
-	TblCurrencyHandler               api.TblCurrencyApi                  `inject:"tblCurrencyHandler"`
-	TblInitStockHandler              api.TblInitStockApi                 `inject:"tblInitStockHandler"`
-	TblStockAdjustHandler            api.TblStockAdjustApi               `inject:"tblStockAdjustHandler"`
-	TblStockSummaryHandler           api.TblStockSummaryApi              `inject:"tblStockSummaryHandler"`
-	TblStockMutationHandler          api.TblStockMutationApi             `inject:"tblStockMutationHandler"`
-	TblStockMovement                 api.TblStockMovementApi             `inject:"tblStockMovementHandler"`
-	TblDirectPurchaseReceive         api.TblDirectPurchaseReceiveApi     `inject:"tblDirectPurchaseReceiveHandler"`
-	TblTaxGroupHandler               api.TblTaxGroupApi                  `inject:"tblTaxGroupHandler"`
-	TblTaxHandler                    api.TblTaxApi                       `inject:"tblTaxHandler"`
-	TblCustomerCategoryHandler       api.TblCustomerCategoryApi          `inject:"tblCustomerCategoryHandler"`
-	TblSiteHandler                   api.TblSiteApi                      `inject:"tblSiteHandler"`
-	TblVendorCategoryHandler         api.TblVendorCategoryApi            `inject:"tblVendorCategoryHandler"`
-	TblVendorRatingHandler           api.TblVendorRatingApi              `inject:"tblVendorRatingHandler"`
-	TblVendorSectorHandler           api.TblVendorSectorApi              `inject:"tblVendorSectorHandler"`
-	TblVendorHandler                 api.TblVendorApi                    `inject:"tblVendorHandler"`
-	TblHistoryOfStockHandler         api.TblHistoryOfStockApi            `inject:"tblHistoryOfStockHandler"`
-	TblDailyStockMovementHandler     api.TblDailyStockMovementApi        `inject:"tblDailyStockMovementHandler"`
-	TblDirectPurchaseRcvHandler      api.TblDirectPurchaseRcvApi         `inject:"tblDirectPurchaseRcvHandler"`
-	TblDirectSalesDeliveryHandler    api.TblDirectSalesDeliveryApi       `inject:"tblDirectSalesDeliveryHandler"`
-	TblMaterialTransferHandler       api.TblMaterialTransferApi          `inject:"tblMaterialTransferHandler"`
-	TblMaterialReceiveHandler        api.TblMaterialReceiveApi           `inject:"tblMaterialReceiveHandler"`
-	TblTransferItemBetweenWhsHandler api.TblTransferItemBetweenWhsApi    `inject:"tblTransferItemBetweenWhsHandler"`
-	TblDirectMaterialReceiveHandler  api.TblDirectMaterialReceiveApi     `inject:"tblDirectMaterialReceiveHandler"`
+	App                               *rest.Fiber                         `inject:"fiber"`
+	Config                            *config.Config                      `inject:"config"`
+	HealthCheckHandler                api.HealthCheckAPI                  `inject:"healthCheckHandler"`
+	TblUserHandler                    api.TblUserApi                      `inject:"tblUserHandler"`
+	TblCountryHandler                 api.TblCountryApi                   `inject:"tblCountryHandler"`
+	TblCityHandler                    api.TblCityApi                      `inject:"tblCityHandler"`
+	TblProvinceHandler                api.TblProvinceAPI                  `inject:"tblProvinceHandler"`
+	MiddlewareHandler                 *custommiddleware.MiddlewareHandler `inject:"middlewareHandler"`
+	TblUomHandler                     api.TblUomApi                       `inject:"tblUomHandler"`
+	TblCoaHandler                     api.TblCoaApi                       `inject:"tblCoaHandler"`
+	TblItemCatHandler                 api.TblItemCatApi                   `inject:"tblItemCatHandler"`
+	TblWarehouseHandler               api.TblWarehouseApi                 `inject:"tblWarehouseHandler"`
+	TblWarehouseCategoryHandler       api.TblWarehouseCategoryApi         `inject:"tblWarehouseCategoryHandler"`
+	TblLogHandler                     api.TblLogApi                       `inject:"tblLogHandler"`
+	TblItemHandler                    api.TblItemApi                      `inject:"tblItemHandler"`
+	TblCurrencyHandler                api.TblCurrencyApi                  `inject:"tblCurrencyHandler"`
+	TblInitStockHandler               api.TblInitStockApi                 `inject:"tblInitStockHandler"`
+	TblStockAdjustHandler             api.TblStockAdjustApi               `inject:"tblStockAdjustHandler"`
+	TblStockSummaryHandler            api.TblStockSummaryApi              `inject:"tblStockSummaryHandler"`
+	TblStockMutationHandler           api.TblStockMutationApi             `inject:"tblStockMutationHandler"`
+	TblStockMovement                  api.TblStockMovementApi             `inject:"tblStockMovementHandler"`
+	TblDirectPurchaseReceive          api.TblDirectPurchaseReceiveApi     `inject:"tblDirectPurchaseReceiveHandler"`
+	TblTaxGroupHandler                api.TblTaxGroupApi                  `inject:"tblTaxGroupHandler"`
+	TblTaxHandler                     api.TblTaxApi                       `inject:"tblTaxHandler"`
+	TblCustomerCategoryHandler        api.TblCustomerCategoryApi          `inject:"tblCustomerCategoryHandler"`
+	TblSiteHandler                    api.TblSiteApi                      `inject:"tblSiteHandler"`
+	TblVendorCategoryHandler          api.TblVendorCategoryApi            `inject:"tblVendorCategoryHandler"`
+	TblVendorRatingHandler            api.TblVendorRatingApi              `inject:"tblVendorRatingHandler"`
+	TblVendorSectorHandler            api.TblVendorSectorApi              `inject:"tblVendorSectorHandler"`
+	TblVendorHandler                  api.TblVendorApi                    `inject:"tblVendorHandler"`
+	TblHistoryOfStockHandler          api.TblHistoryOfStockApi            `inject:"tblHistoryOfStockHandler"`
+	TblDailyStockMovementHandler      api.TblDailyStockMovementApi        `inject:"tblDailyStockMovementHandler"`
+	TblDirectPurchaseRcvHandler       api.TblDirectPurchaseRcvApi         `inject:"tblDirectPurchaseRcvHandler"`
+	TblDirectSalesDeliveryHandler     api.TblDirectSalesDeliveryApi       `inject:"tblDirectSalesDeliveryHandler"`
+	TblMaterialTransferHandler        api.TblMaterialTransferApi          `inject:"tblMaterialTransferHandler"`
+	TblMaterialReceiveHandler         api.TblMaterialReceiveApi           `inject:"tblMaterialReceiveHandler"`
+	TblTransferItemBetweenWhsHandler  api.TblTransferItemBetweenWhsApi    `inject:"tblTransferItemBetweenWhsHandler"`
+	TblDirectMaterialReceiveHandler   api.TblDirectMaterialReceiveApi     `inject:"tblDirectMaterialReceiveHandler"`
+	TblMaterialRequestHandler         api.TblMaterialRequestApi           `inject:"tblMaterialRequestHandler"`
+	TblVendorQuotationHandler         api.TblVendorQuotationApi           `inject:"tblVendorQuotationHandler"`
+	TblPurchaseOrderRequestHandler    api.TblPurchaseOrderRequestApi      `inject:"tblPurchaseOrderRequestHandler"`
+	TblPurchaseOrderHandler           api.TblPurchaseOrderApi             `inject:"tblPurchaseOrderHandler"`
+	TblPurchaseMaterialReceiveHandler api.TblPurchaseMaterialReceiveApi   `inject:"tblPurchaseMaterialReceiveHandler"`
+	TblPurchaseReturnDeliveryHandler  api.TblPurchaseReturnDeliveryApi    `inject:"tblPurchaseReturnDeliveryHandler"`
+	TblOrderReportHandler             api.TblOrderReportApi               `inject:"tblOrderReportHandler"`
+	DashboardHandler                  api.DashboardApi                    `inject:"DashboardHandler"`
 }
 
 func (a *Api) Startup() error {
@@ -164,13 +172,6 @@ func (a *Api) Startup() error {
 	stockMovement := v1.Group("stock-movement")
 	stockMovement.Get("/", a.TblStockMovement.Fetch) // get stock movement
 
-	// direct purchase receive
-	// directPurchaseReceive := v1.Group("direct-purchase-receive")
-	// directPurchaseReceive.Get("/", a.TblDirectPurchaseReceive.Fetch)
-	// directPurchaseReceive.Get("/:code", a.TblDirectPurchaseReceive.Detail)
-	// directPurchaseReceive.Post("/", a.TblDirectPurchaseReceive.Create)
-	// directPurchaseReceive.Put("/:code", a.TblDirectPurchaseReceive.Update)
-
 	// tax group
 	taxGroup := v1.Group("/tax-group")
 	taxGroup.Get("/", a.TblTaxGroupHandler.Fetch)
@@ -224,6 +225,10 @@ func (a *Api) Startup() error {
 	vendor.Post("/", a.TblVendorHandler.Create)
 	vendor.Put("/:code", a.TblVendorHandler.Update)
 
+	// master vendor
+	contactVendor := v1.Group("/contact-vendor")
+	contactVendor.Get("/", a.TblVendorHandler.GetContact)
+
 	// history of stock
 	historyOfStock := v1.Group("/history-of-stock")
 	historyOfStock.Get("/", a.TblHistoryOfStockHandler.Fetch)
@@ -264,6 +269,86 @@ func (a *Api) Startup() error {
 	directMaterialReceive.Get("/", a.TblDirectMaterialReceiveHandler.Fetch)
 	directMaterialReceive.Post("/", a.TblDirectMaterialReceiveHandler.Create)
 	directMaterialReceive.Put("/:code", a.TblDirectMaterialReceiveHandler.Update)
+
+	// material request
+	materialRequest := v1.Group("/material-request")
+	materialRequest.Get("/", a.TblMaterialRequestHandler.Fetch)
+	materialRequest.Post("/", a.TblMaterialRequestHandler.Create)
+	materialRequest.Put("/:code", a.TblMaterialRequestHandler.Update)
+
+	// vendor quotation
+	vendorQuotation := v1.Group("/vendor-quotation")
+	vendorQuotation.Get("/", a.TblVendorQuotationHandler.Fetch)
+	vendorQuotation.Post("/", a.TblVendorQuotationHandler.Create)
+	vendorQuotation.Put("/:code", a.TblVendorQuotationHandler.Update)
+
+	// purchase order request
+	purchaseOrderRequest := v1.Group("/purchase-order-request")
+	purchaseOrderRequest.Get("/", a.TblPurchaseOrderRequestHandler.Fetch)
+	purchaseOrderRequest.Post("/", a.TblPurchaseOrderRequestHandler.Create)
+	purchaseOrderRequest.Put("/:code", a.TblPurchaseOrderRequestHandler.Update)
+
+	// get material request
+	getMaterialRequest := v1.Group("/get-material-request")
+	getMaterialRequest.Get("/", a.TblMaterialRequestHandler.GetMaterialRequest)
+
+	// get vendor quotation
+	getVendorQuotation := v1.Group("/get-vendor-quotation")
+	getVendorQuotation.Get("/", a.TblVendorQuotationHandler.GetVendorQuotation)
+
+	// get purchase order req
+	getPurchaseOrderRequest := v1.Group("/get-purchase-order-request")
+	getPurchaseOrderRequest.Get("/", a.TblPurchaseOrderRequestHandler.GetPurchaseOrderRequest)
+
+	// purchase order
+	purchaseOrder := v1.Group("/purchase-order")
+	purchaseOrder.Get("/", a.TblPurchaseOrderHandler.Fetch)
+	purchaseOrder.Post("/", a.TblPurchaseOrderHandler.Create)
+	purchaseOrder.Put("/:code", a.TblPurchaseOrderHandler.Update)
+
+	// purchase material receive
+	purchaseMaterialReceive := v1.Group("/purchase-material-receive")
+	purchaseMaterialReceive.Get("/", a.TblPurchaseMaterialReceiveHandler.Fetch)
+	purchaseMaterialReceive.Post("/", a.TblPurchaseMaterialReceiveHandler.Create)
+	purchaseMaterialReceive.Put("/:code", a.TblPurchaseMaterialReceiveHandler.Update)
+
+	// get purchase order req
+	getPurchaseOrder := v1.Group("/get-purchase-order")
+	getPurchaseOrder.Get("/", a.TblPurchaseOrderHandler.GetPurchaseOrder)
+
+	// purchase material receive
+	purchaseReturnDelivery := v1.Group("/purchase-return-delivery")
+	purchaseReturnDelivery.Get("/", a.TblPurchaseReturnDeliveryHandler.Fetch)
+	purchaseReturnDelivery.Post("/", a.TblPurchaseReturnDeliveryHandler.Create)
+	purchaseReturnDelivery.Put("/:code", a.TblPurchaseReturnDeliveryHandler.Update)
+
+	// get return material
+	getReturnMaterial := v1.Group("/get-return-material")
+	getReturnMaterial.Get("/", a.TblPurchaseReturnDeliveryHandler.GetReturnMaterial)
+
+	// transfer between warehouse
+	transferBetweehWhs := v1.Group("/transfer-between-warehouse")
+	transferBetweehWhs.Get("/", a.TblTransferItemBetweenWhsHandler.Fetch)
+
+	// purchase material receive
+	purchaseMaterialReceiveReport := v1.Group("/purchase-material-receive-report")
+	purchaseMaterialReceiveReport.Get("/", a.TblPurchaseMaterialReceiveHandler.Reporting)
+
+	// Outstanding Material Request
+	outstandingMaterialReq := v1.Group("/outstanding-material-request")
+	outstandingMaterialReq.Get("/", a.TblMaterialRequestHandler.OutstandingMaterial)
+
+	// Outstanding Purchase Order
+	outstandingPurchaseOrder := v1.Group("/outstanding-purchase-order")
+	outstandingPurchaseOrder.Get("/", a.TblPurchaseOrderHandler.OutstandingPO)
+
+	// Order Report by Vendor
+	ourderReportByVendor := v1.Group("/order-report-by-vendor")
+	ourderReportByVendor.Get("/", a.TblOrderReportHandler.ByVendor)
+
+	// dashboard
+	dashboard := v1.Group("/dashboard")
+	dashboard.Get("/", a.DashboardHandler.Fetch)
 
 	return nil
 }
